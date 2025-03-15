@@ -12,6 +12,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.mapdb:mapdb:3.0.8") // MapDB dependency
+    implementation("org.jsoup:jsoup:1.19.1") // Jsoup dependency
 }
 
 tasks.test {

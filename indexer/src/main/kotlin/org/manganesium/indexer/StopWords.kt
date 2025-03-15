@@ -1,4 +1,4 @@
-package org.manganesium.org.manganesium.indexer
+package org.manganesium.indexer
 
 class StopWords {
 }
