@@ -1,4 +1,4 @@
-package dataAccessObject
+package org.manganesium.dataAccessObject
 
 import org.mapdb.DB
 

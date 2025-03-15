@@ -1,6 +1,7 @@
 package dataAccessObject
 
-import org.manganesium.models.Page
+import models.Page
+import org.manganesium.dataAccessObject.DatabaseManager
 import org.mapdb.DB
 import org.mapdb.DBMaker
 import java.io.File

@@ -1,4 +1,4 @@
-package org.manganesium.models
+package models
 
 data class Page(
     val id: Long,
