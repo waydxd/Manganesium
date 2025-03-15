@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
 }
 
-group = "org.manganesium.indexer"
+group = "org.manganesium"
 version = "unspecified"
 
 repositories {
