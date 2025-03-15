@@ -1,16 +1,41 @@
 package dataAccessObject
 
+import org.manganesium.models.Page
 import org.mapdb.DB
+import org.mapdb.DBMaker
+import java.io.File
 
 class CrawlerDAO(db: DB) : DatabaseManager(db) {
-    // Store page metadata
-    fun storePageMetadata(pageId: String, metadata: Map<String, Any>) {
-        forwardIndex[pageId] = metadata
+
+    constructor(dbFile: File) : this(
+        DBMaker.fileDB(dbFile)
+            .fileMmapEnable()
+            .closeOnJvmShutdown()
+            .make()
+    )
+
+    constructor(dbPath: String) : this(File(dbPath))
+
+    // Store URL to page ID mapping and return the page ID
+    fun storeUrlToPageIdMapping(url: String): String {
+        // Check if URL already exists in the mapping
+        val existingPageId = urlToPageId[url]
+        if (existingPageId != null) {
+            return existingPageId
+        }
+
+        // Generate a new unique page ID
+        val newPageId = java.util.UUID.randomUUID().toString()
+
+        // Store the URL to page ID mapping
+        urlToPageId[url] = newPageId
+
+        return newPageId
     }
 
-    // Store URL to page ID mapping
-    fun storeUrlToPageIdMapping(url: String, pageId: String) {
-        urlToPageId[url] = pageId
+    // Store page keywords
+    fun storePageKeywords(pageId: String, keywords: List<String>) {
+        forwardIndex[pageId] = keywords
     }
 
     // Retrieve page ID for a URL
@@ -26,5 +51,16 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
     // Retrieve child pages for a parent page
     fun getChildPages(parentPageId: String): List<String> {
         return parentChildLinks[parentPageId] as? List<String> ?: emptyList()
+    }
+
+    // Store page properties
+    fun storePageProperties(pageId: String, page: Page) {
+        val properties = mapOf(
+            "title" to page.title.toString(),
+            "lastModified" to page.lastModified,
+            "size" to page.size,
+            "links" to page.links
+        )
+        pageProperties[pageId] = properties
     }
 }
