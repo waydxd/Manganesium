@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(project(":utils"))  // Add dependency to utils module
     testImplementation(kotlin("test"))
+    implementation("org.jsoup:jsoup:1.19.1") // Jsoup dependency
 }
 
 tasks.test {

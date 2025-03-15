@@ -1,4 +1,4 @@
-package org.manganesium.crawler.Crawler
+package org.manganesium.crawler
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

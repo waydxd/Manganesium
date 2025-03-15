@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Add CrawlerDAO, CrawlerService, and Page model with database management features" />
+    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Add dependency to utils module and refactor package structure for CrawlerDAO, CrawlerService, and Page model" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,12 +18,26 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="manganesium" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="manganesium" type="f1a62948:ProjectNode" />
+                <item name="crawler" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="manganesium" type="f1a62948:ProjectNode" />
+                <item name="crawler" type="2d1252cf:ModuleNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
               </path>
             </expand>
             <select />
@@ -41,12 +55,15 @@
     &quot;assignee&quot;: &quot;WL-jpg&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/waydxd/COMP4321-Group25.git&quot;,
-    &quot;accountId&quot;: &quot;a970a257-b3a9-4383-921c-a9fd982e054e&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/waydxd/COMP4321-Group25.git",
+    "accountId": "faf3969d-f29d-4e97-bba6-57dfff28b142"
   }
-}</component>
+}]]></component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="true" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -56,18 +73,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -86,6 +111,7 @@
       <updated>1742024273685</updated>
       <workItem from="1742024276127" duration="152000" />
       <workItem from="1742024433373" duration="19000" />
+      <workItem from="1742050128702" duration="4031000" />
     </task>
     <task id="LOCAL-00001" summary="Add CrawlerDAO, CrawlerService, and Page model with database management features">
       <option name="closed" value="true" />
@@ -95,7 +121,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742050076678</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Add dependency to utils module and refactor package structure for CrawlerDAO, CrawlerService, and Page model">
+      <option name="closed" value="true" />
+      <created>1742051525938</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1742051525938</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,6 +149,11 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add CrawlerDAO, CrawlerService, DatabaseManager, and Page model with enhanced database management features" />
     <MESSAGE value="Add CrawlerDAO, CrawlerService, and Page model with database management features" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add CrawlerDAO, CrawlerService, and Page model with database management features" />
+    <MESSAGE value="Add dependency to utils module and refactor package structure for CrawlerDAO, CrawlerService, and Page model" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add dependency to utils module and refactor package structure for CrawlerDAO, CrawlerService, and Page model" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>false</integration-enabled>
+    <settings-migrated>true</settings-migrated>
   </component>
 </project>
