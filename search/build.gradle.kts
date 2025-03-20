@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(project(":utils"))  // Add dependency to utils module
     testImplementation(kotlin("test"))
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3") // Kotlin logging dependency
 }
 
 tasks.test {
