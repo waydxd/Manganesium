@@ -23,7 +23,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
      * @param startUrls URLs to begin crawling from
      * @param maxDepth Number of levels to traverse
      */
-    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int = 30 ) {
+    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int) {
         logger.info { "[CrawlerService:startCrawling] Starting crawling process with ${startUrls.size} start URLs and maxDepth=$maxDepth" }
 
         // Initialize the queue
