@@ -23,7 +23,7 @@ fun main() {
 
     // Start crawling
     logger.info { "[Main:main] Starting the crawling process" }
-    crawlerService.startCrawling(startUrls, maxDepth = 2)
+    crawlerService.startCrawling(startUrls, maxDepth = 2, maxPages = 30)
 
     // Close the DAO to commit and release resources
     crawlerService.close()
