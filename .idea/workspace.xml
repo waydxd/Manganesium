@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Add Kotlin logging dependency to build.gradle.kts">
+    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Add SLF4J dependency to build.gradle.kts for improved logging support">
       <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/DB.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/src/main/resources/logback.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crawler/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/crawler/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/indexer/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/indexer/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/search/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/search/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/utils/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -164,7 +162,7 @@
       <workItem from="1742024433373" duration="19000" />
       <workItem from="1742050128702" duration="14795000" />
       <workItem from="1742402112733" duration="648000" />
-      <workItem from="1742458888457" duration="1131000" />
+      <workItem from="1742458888457" duration="2257000" />
     </task>
     <task id="LOCAL-00001" summary="Add CrawlerDAO, CrawlerService, and Page model with database management features">
       <option name="closed" value="true" />
@@ -198,7 +196,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742459019224</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Add SLF4J dependency to build.gradle.kts for improved logging support">
+      <option name="closed" value="true" />
+      <created>1742460257619</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1742460257619</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -221,7 +227,8 @@
     <MESSAGE value="Add dependency to utils module and refactor package structure for CrawlerDAO, CrawlerService, and Page model" />
     <MESSAGE value="Add Jsoup dependency and refactor package structure for Crawler" />
     <MESSAGE value="Add Kotlin logging dependency to build.gradle.kts" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Kotlin logging dependency to build.gradle.kts" />
+    <MESSAGE value="Add SLF4J dependency to build.gradle.kts for improved logging support" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add SLF4J dependency to build.gradle.kts for improved logging support" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
