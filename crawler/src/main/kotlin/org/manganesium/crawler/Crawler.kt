@@ -3,8 +3,12 @@ package org.manganesium.crawler
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
+import java.util.logging.Logger
 
 class Crawler {
+    // Initialize the logger
+    private val logger = Logger.getLogger(Crawler::class.java.name)
+
     /**
      * Fetch the HTML content of the given URL using Jsoup.
      *
@@ -13,9 +17,10 @@ class Crawler {
      */
     fun fetchPage(url: String): Document? {
         return try {
+            logger.fine("Fetching page from URL: $url")
             Jsoup.connect(url).get()
         } catch (e: IOException) {
-            println("Failed to fetch $url: ${e.message}")
+            logger.severe("Failed to fetch $url: ${e.message}")
             null
         }
     }
@@ -27,6 +32,7 @@ class Crawler {
      * @return A list of absolute URLs found in the document.
      */
     fun extractLinks(doc: Document): List<String> {
+        logger.fine("Extracting links from document")
         val links = mutableListOf<String>()
         val anchorElements = doc.select("a[href]")
         for (element in anchorElements) {
@@ -35,6 +41,7 @@ class Crawler {
                 links.add(absoluteUrl)
             }
         }
+        logger.fine("Extracted ${links.size} links from the document")
         return links
     }
 
@@ -46,10 +53,13 @@ class Crawler {
      * - Filter out stop words, etc.
      */
     fun extractKeywords(doc: Document): List<String> {
+        logger.fine("Extracting keywords from document")
         val textContent = doc.body()?.text() ?: ""
-        return textContent
+        val keywords = textContent
             .split("\\s+".toRegex())
             .map { it.lowercase() }
             .filter { it.isNotBlank() }
+        logger.fine("Extracted ${keywords.size} keywords from the document")
+        return keywords
     }
 }
