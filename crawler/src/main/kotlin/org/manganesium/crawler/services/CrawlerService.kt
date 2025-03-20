@@ -76,12 +76,9 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
         logger.fine("Computed keyword frequencies for ${keywordFrequencies.size} unique keywords")
 
         // (Optional) store keywords in forward index
-        logger.fine("Storing page keywords in forward index")
         crawlerDAO.storePageKeywords(pageId, rawKeywords)
-        logger.fine("Stored page keywords in forward index")
 
         // Extract links
-        logger.fine("Extracting links from document")
         val links = crawler.extractLinks(document)
         logger.fine("Extracted ${links.size} links from the document")
 
@@ -149,9 +146,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
         )
 
         logger.fine { "Page object: $page" } // Print the Page object
-        logger.fine{ "Storing Page object in DAO" }
         crawlerDAO.storePageProperties(pageId, page)
-        logger.fine { "Stored Page object in DAO" }
     }
 
     /**
