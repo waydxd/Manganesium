@@ -4,9 +4,11 @@ import models.Page
 import org.manganesium.dataAccessObject.DatabaseManager
 import org.mapdb.DB
 import org.mapdb.DBMaker
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 
 class CrawlerDAO(db: DB) : DatabaseManager(db) {
+    private val logger = KotlinLogging.logger {}
 
     constructor(dbFile: File) : this(
         DBMaker.fileDB(dbFile)
@@ -22,11 +24,13 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
         // Check if URL already exists in the mapping
         val existingPageId = urlToPageId[url]
         if (existingPageId != null) {
+            logger.debug { "[CrawlerDAO:storeUrlToPageIdMapping] URL already exists in mapping: $url -> $existingPageId" }
             return existingPageId
         }
 
         // Generate a new unique page ID
         val newPageId = java.util.UUID.randomUUID().toString()
+        logger.debug { "[CrawlerDAO:storeUrlToPageIdMapping] Generated new page ID for URL: $url -> $newPageId" }
 
         // Store the URL to page ID mapping
         urlToPageId[url] = newPageId
@@ -36,26 +40,33 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
 
     // Store page keywords
     fun storePageKeywords(pageId: String, keywords: List<String>) {
+        logger.debug { "[CrawlerDAO:storePageKeywords] Storing ${keywords.size} keywords for page ID: $pageId" }
         forwardIndex[pageId] = keywords
     }
 
     // Retrieve page ID for a URL
     fun getPageIdForUrl(url: String): String? {
-        return urlToPageId[url]
+        val pageId = urlToPageId[url]
+        logger.debug { "[CrawlerDAO:getPageIdForUrl] Retrieved page ID for URL: $url -> ${pageId ?: "not found"}" }
+        return pageId
     }
 
     // Store parent/child links
     fun storeParentChildLinks(parentPageId: String, childPageIds: List<String>) {
+        logger.debug { "[CrawlerDAO:storeParentChildLinks] Storing ${childPageIds.size} child links for parent page ID: $parentPageId" }
         parentChildLinks[parentPageId] = childPageIds
     }
 
     // Retrieve child pages for a parent page
     fun getChildPages(parentPageId: String): List<String> {
-        return parentChildLinks[parentPageId] as? List<String> ?: emptyList()
+        val childPages = parentChildLinks[parentPageId] as? List<String> ?: emptyList()
+        logger.debug { "[CrawlerDAO:getChildPages] Retrieved ${childPages.size} child pages for parent page ID: $parentPageId" }
+        return childPages
     }
 
     // Store page properties
     fun storePageProperties(pageId: String, page: Page) {
+        logger.debug { "[CrawlerDAO:storePageProperties] Storing properties for page ID: $pageId, title: ${page.title}" }
         val properties = mapOf(
             "title" to page.title.toString(),
             "lastModified" to page.lastModified,

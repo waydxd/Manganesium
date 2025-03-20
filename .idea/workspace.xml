@@ -5,10 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Add SLF4J dependency to build.gradle.kts for improved logging support">
-      <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/DB.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/src/main/resources/logback.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/CrawlerMain.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/crawler/src/main/resources/logback.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/utils/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawler/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/crawler/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/Crawler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/Crawler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/Main.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/services/CrawlerService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler/services/CrawlerService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/CrawlerDAO.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/CrawlerDAO.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/main/resources/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/resources/logback.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,41 +91,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Gradle.Build COMP4321-Group25.executor&quot;: &quot;Run&quot;,
-    &quot;Kotlin.DBKt.executor&quot;: &quot;Run&quot;,
-    &quot;Kotlin.MainKt.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Gradle.Build COMP4321-Group25.executor": "Run",
+    "Kotlin.CrawlerMainKt.executor": "Run",
+    "Kotlin.DBKt.executor": "Run",
+    "Kotlin.MainKt.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;hsqldb&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "hsqldb"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/utils/src/main/kotlin" />
       <recent name="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.DBKt">
+  <component name="RunManager" selected="Kotlin.CrawlerMainKt">
+    <configuration name="CrawlerMainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.manganesium.crawler.CrawlerMainKt" />
+      <module name="manganesium.crawler.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="DBKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="DBKt" />
       <module name="manganesium.utils.main" />
@@ -128,17 +141,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.manganesium.crawler.MainKt" />
-      <module name="manganesium.crawler.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Kotlin.CrawlerMainKt" />
         <item itemvalue="Kotlin.DBKt" />
-        <item itemvalue="Kotlin.MainKt" />
       </list>
     </recent_temporary>
   </component>
