@@ -14,8 +14,14 @@ open class DatabaseManager(private val db: DB) {
         .createOrOpen()
 
     // Inverted Index: keyword -> list of pageIds (BTreeMap for ordered keyword searches)
-    protected val invertedIndex: BTreeMap<String, Any> = db
-        .treeMap("inverted_index")
+    protected val invertedTitle: BTreeMap<String, Any> = db
+        .treeMap("inverted_title")
+        .keySerializer(Serializer.STRING)
+        .valueSerializer(Serializer.JAVA)
+        .createOrOpen()
+
+    protected val invertedBody: BTreeMap<String, Any> = db
+        .treeMap("inverted_body")
         .keySerializer(Serializer.STRING)
         .valueSerializer(Serializer.JAVA)
         .createOrOpen()
@@ -34,17 +40,24 @@ open class DatabaseManager(private val db: DB) {
         .valueSerializer(Serializer.JAVA)
         .createOrOpen()
 
-    // Stop Words: set of stop words (HTreeSet for fast membership checks)
+    // Stop Words: set of stop words
     protected val stopWords = db
         .hashSet("stop_words")
         .serializer(Serializer.STRING)
         .createOrOpen()
 
-    // Page properties (HTreeMap for fast random access)
+    // Page properties
     protected val pageProperties: HTreeMap<String, Any> = db
         .hashMap("page_properties")
         .keySerializer(Serializer.STRING)
         .valueSerializer(Serializer.JAVA)
+        .createOrOpen()
+
+    // WordID to Word mapping
+    protected val wordToWordID: HTreeMap<String, String> = db
+        .hashMap("word_to_word_id")
+        .keySerializer(Serializer.STRING)
+        .valueSerializer(Serializer.STRING)
         .createOrOpen()
 
     // Commit changes and close the database

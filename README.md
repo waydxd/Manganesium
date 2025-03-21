@@ -14,6 +14,9 @@ This project is a comprehensive application developed as part of the COMP4321 co
 The project is built using the following technologies:
 - **Vue.js** (62.5%)
 - **Kotlin** (13.6%)
+  - MapDB
+  - Jsoup
+  - Gradle
 - **CSS** (12.5%)
 - **TypeScript** (9.8%)
 - **HTML** (1.6%)

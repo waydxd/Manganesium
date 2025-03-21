@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Update .gitignore to include *.db and ensure .idea is ignored">
+    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links">
+      <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/models/Post.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/DB.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/DB.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/DatabaseManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/DatabaseManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/IndexerDAO.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/IndexerDAO.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,8 +55,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -119,7 +122,14 @@
       <recent name="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.DBKt">
+  <component name="RunManager" selected="Kotlin.CrawlerDBKt">
+    <configuration name="CrawlerDBKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="CrawlerDBKt" />
+      <module name="manganesium.utils.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="CrawlerMainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.manganesium.crawler.CrawlerMainKt" />
       <module name="manganesium.crawler.main" />
@@ -127,16 +137,9 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DBKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="DBKt" />
-      <module name="manganesium.utils.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Kotlin.DBKt" />
+        <item itemvalue="Kotlin.CrawlerDBKt" />
         <item itemvalue="Kotlin.CrawlerMainKt" />
       </list>
     </recent_temporary>
@@ -162,6 +165,8 @@
       <workItem from="1742050128702" duration="14795000" />
       <workItem from="1742402112733" duration="648000" />
       <workItem from="1742458888457" duration="2257000" />
+      <workItem from="1742495914161" duration="994000" />
+      <workItem from="1742537546386" duration="2077000" />
     </task>
     <task id="LOCAL-00001" summary="Add CrawlerDAO, CrawlerService, and Page model with database management features">
       <option name="closed" value="true" />
@@ -227,7 +232,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742485504747</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links">
+      <option name="closed" value="true" />
+      <created>1742491414447</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1742491414447</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,7 +268,8 @@
     <MESSAGE value="Add application plugin, update logging dependencies, and implement Kotlin logging in Crawler" />
     <MESSAGE value="Refactor DB.kt to use Kotlin logging and update logback.xml for database logging" />
     <MESSAGE value="Update .gitignore to include *.db and ensure .idea is ignored" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update .gitignore to include *.db and ensure .idea is ignored" />
+    <MESSAGE value="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>

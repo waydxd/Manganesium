@@ -1,18 +1,29 @@
 package org.manganesium.dataAccessObject
 
 import org.mapdb.DB
+import java.util.*
 
 class IndexerDAO(db: DB) : DatabaseManager(db) {
     // Update inverted index
-    fun storeInvertedIndex(keyword: String, pageId: String) {
-        val pages = invertedIndex[keyword] as? MutableSet<String> ?: mutableSetOf()
+    fun storeInvertedTitle(keyword: String, pageId: String) {
+        val pages = invertedTitle[keyword] as? MutableSet<String> ?: mutableSetOf()
         pages.add(pageId)
-        invertedIndex[keyword] = pages
+        invertedTitle[keyword] = pages
+    }
+    fun storeInvertedBody(keyword: String, pageId: String) {
+        val pages = invertedBody[keyword] as? MutableSet<String> ?: mutableSetOf()
+        pages.add(pageId)
+        invertedBody[keyword] = pages
     }
 
-    // Retrieve pages for a keyword
-    fun getPagesForKeyword(keyword: String): List<String> {
-        return invertedIndex[keyword] as? List<String> ?: emptyList()
+    // Retrieve pages body for a keyword
+    fun getPagesBodyForKeyword(keyword: String): List<String> {
+        return invertedBody[keyword] as? List<String> ?: emptyList()
+    }
+
+    // Retrieve pages title for a keyword
+    fun getPagesTitleForKeyword(keyword: String): List<String> {
+        return invertedTitle[keyword] as? List<String> ?: emptyList()
     }
 
     // Store stop words
@@ -23,5 +34,22 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
     // Retrieve stop words
     fun getStopWords(): Set<String> {
         return stopWords.toSet()
+    }
+
+    // WordID to Word mapping and return the word ID
+    fun storeWordIdToWordMapping(word: String): String {
+        val existingWordId = wordToWordID[word]
+        if (existingWordId != null) {
+            return existingWordId
+        }
+        val newWordId = UUID.randomUUID().toString()
+        wordToWordID[word] = newWordId
+
+        return newWordId
+    }
+
+    // Retrieve word for a word ID
+    fun getWordForWordId(wordId: String): String? {
+        return wordToWordID[wordId]
     }
 }
