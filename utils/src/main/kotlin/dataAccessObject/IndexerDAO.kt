@@ -75,6 +75,12 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         return wordToWordID[keyword]
     }
 
+    // Store page keywords
+    fun storePageKeywords(pageId: String, keywords: List<String>) {
+        logger.debug { "[CrawlerDAO:storePageKeywords] Storing ${keywords.size} keywords for page ID: $pageId" }
+        forwardIndex[pageId] = keywords
+    }
+
     // Debug function to check if stored pages are valid.
     private fun debugValidatePages(wordId: String) {
         logger.debug { "Validating pages for wordId: $wordId" }

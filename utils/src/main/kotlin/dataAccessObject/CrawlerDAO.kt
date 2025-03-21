@@ -38,11 +38,6 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
         return newPageId
     }
 
-    // Store page keywords
-    fun storePageKeywords(pageId: String, keywords: List<String>) {
-        logger.debug { "[CrawlerDAO:storePageKeywords] Storing ${keywords.size} keywords for page ID: $pageId" }
-        forwardIndex[pageId] = keywords
-    }
 
     // Retrieve page ID for a URL
     fun getPageIdForUrl(url: String): String? {

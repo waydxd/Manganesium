@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links">
-      <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/models/Post.kt" afterDir="false" />
+    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection">
+      <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/phase1Test/test_program.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/DatabaseManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/DatabaseManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/IndexerDAO.kt" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/kotlin/dataAccessObject/IndexerDAO.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/test_program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/test_program.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,13 +54,15 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin File" />
         <option value="Kotlin Class" />
+        <option value="JUnit5 Test Class" />
+        <option value="Kotlin File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -87,48 +88,108 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Gradle.Build COMP4321-Group25.executor&quot;: &quot;Run&quot;,
-    &quot;Kotlin.CrawlerMainKt.executor&quot;: &quot;Run&quot;,
-    &quot;Kotlin.DBKt.executor&quot;: &quot;Run&quot;,
-    &quot;Kotlin.MainKt.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Gradle.Build COMP4321-Group25.executor": "Run",
+    "Gradle.CrawlerDAOTest (1).executor": "Run",
+    "Gradle.CrawlerDAOTest.executor": "Run",
+    "Gradle.IndexerDAOTest.executor": "Run",
+    "Gradle.IndexerDAOTest.testGetWordForWordId.executor": "Run",
+    "Gradle.IndexerDAOTest.testGetWordIdForWord.executor": "Run",
+    "Gradle.IndexerDAOTest.testStoreInvertedBody.executor": "Debug",
+    "Gradle.IndexerDAOTest.testStoreInvertedTitle.executor": "Run",
+    "Kotlin.CrawlerMainKt.executor": "Run",
+    "Kotlin.DBKt.executor": "Run",
+    "Kotlin.IndexerDBKt.executor": "Run",
+    "Kotlin.MainKt.executor": "Run",
+    "Kotlin.Test_programKt.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "kotlin-language-version-configured": "true",
+    "last_directory_selection": "/Users/wayd/IdeaProjects/COMP4321-Group25/utils/src/test/kotlin/dataAccessObject",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;hsqldb&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "hsqldb"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/utils/src/main/kotlin" />
       <recent name="$PROJECT_DIR$/crawler/src/main/kotlin/org/manganesium/crawler" />
     </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="dataAccessObject" />
+    </key>
   </component>
-  <component name="RunManager" selected="Kotlin.CrawlerDBKt">
-    <configuration name="CrawlerDBKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="CrawlerDBKt" />
-      <module name="manganesium.utils.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+  <component name="RunManager" selected="Kotlin.Test_programKt">
+    <configuration name="IndexerDAOTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":utils:test" />
+            <option value="--tests" />
+            <option value="&quot;dataAccessObject.IndexerDAOTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="IndexerDAOTest.testGetWordIdForWord" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":utils:test" />
+            <option value="--tests" />
+            <option value="&quot;dataAccessObject.IndexerDAOTest.testGetWordIdForWord&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
     </configuration>
     <configuration name="CrawlerMainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.manganesium.crawler.CrawlerMainKt" />
@@ -137,10 +198,27 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="IndexerDBKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="IndexerDBKt" />
+      <module name="manganesium.utils.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test_programKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="phase1Test.Test_programKt" />
+      <module name="manganesium.utils.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Kotlin.CrawlerDBKt" />
+        <item itemvalue="Kotlin.Test_programKt" />
+        <item itemvalue="Kotlin.IndexerDBKt" />
         <item itemvalue="Kotlin.CrawlerMainKt" />
+        <item itemvalue="Gradle.IndexerDAOTest" />
+        <item itemvalue="Gradle.IndexerDAOTest.testGetWordIdForWord" />
       </list>
     </recent_temporary>
   </component>
@@ -166,7 +244,7 @@
       <workItem from="1742402112733" duration="648000" />
       <workItem from="1742458888457" duration="2257000" />
       <workItem from="1742495914161" duration="994000" />
-      <workItem from="1742537546386" duration="2077000" />
+      <workItem from="1742537546386" duration="15008000" />
     </task>
     <task id="LOCAL-00001" summary="Add CrawlerDAO, CrawlerService, and Page model with database management features">
       <option name="closed" value="true" />
@@ -240,7 +318,63 @@
       <option name="project" value="LOCAL" />
       <updated>1742491414447</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Refactor DatabaseManager and IndexerDAO to support separate inverted indices for titles and bodies, and add word-to-ID mapping functionality">
+      <option name="closed" value="true" />
+      <created>1742539640288</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1742539640288</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Refactor IndexerDAO to use Post objects for inverted index storage and retrieval">
+      <option name="closed" value="true" />
+      <created>1742541220105</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1742541220105</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Enhance IndexerDAO with detailed documentation and improve keyword mapping methods">
+      <option name="closed" value="true" />
+      <created>1742549813170</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1742549813170</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Rename wordID to pageID in Post data class">
+      <option name="closed" value="true" />
+      <created>1742549950204</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1742549950204</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Add CrawlerDAO tests and update Page and Post data classes for improved functionality">
+      <option name="closed" value="true" />
+      <created>1742574644788</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1742574644788</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Refactor Indexer and IndexerDAO to use updated package structure and improve logging in data handling methods">
+      <option name="closed" value="true" />
+      <created>1742577159049</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1742577159049</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection">
+      <option name="closed" value="true" />
+      <created>1742578633043</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1742578633043</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,7 +403,14 @@
     <MESSAGE value="Refactor DB.kt to use Kotlin logging and update logback.xml for database logging" />
     <MESSAGE value="Update .gitignore to include *.db and ensure .idea is ignored" />
     <MESSAGE value="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rename DB.kt to crawlerDB.kt and implement logging for parent-child links" />
+    <MESSAGE value="Refactor DatabaseManager and IndexerDAO to support separate inverted indices for titles and bodies, and add word-to-ID mapping functionality" />
+    <MESSAGE value="Refactor IndexerDAO to use Post objects for inverted index storage and retrieval" />
+    <MESSAGE value="Enhance IndexerDAO with detailed documentation and improve keyword mapping methods" />
+    <MESSAGE value="Rename wordID to pageID in Post data class" />
+    <MESSAGE value="Add CrawlerDAO tests and update Page and Post data classes for improved functionality" />
+    <MESSAGE value="Refactor Indexer and IndexerDAO to use updated package structure and improve logging in data handling methods" />
+    <MESSAGE value="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>

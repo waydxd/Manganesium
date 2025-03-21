@@ -21,6 +21,7 @@ class IndexerDAOTest {
   db.treeMap("inverted_body", Serializer.STRING, Serializer.JAVA).create()
   db.hashSet("stop_words", Serializer.STRING).create()
   db.hashMap("word_to_word_id", Serializer.STRING, Serializer.STRING).create()
+  db.hashMap("forward_index", Serializer.STRING, Serializer.JAVA).create()
   // Pre-create the reverse mapping.
 //  db.hashMap("wordIdToWord", Serializer.STRING, Serializer.STRING).create()
   indexerDAO = IndexerDAO(db)
@@ -62,6 +63,16 @@ class IndexerDAOTest {
   mapping[wordId] = mutableSetOf(post1, post2)
   val pages = indexerDAO.getPagesBodyForKeyword(wordId)
   assertEquals(listOf(post1, post2), pages)
+ }
+
+ @Test
+ fun testStorePageKeywords() {
+  val pageId = "page1"
+  val keywords = listOf("keyword1", "keyword2")
+  indexerDAO.storePageKeywords(pageId, keywords)
+  val forwardIndex = db.hashMap("forward_index", Serializer.STRING, Serializer.JAVA).open()
+  val storedKeywords = forwardIndex[pageId] as? List<String>
+  assertEquals(keywords, storedKeywords)
  }
 
  @Test

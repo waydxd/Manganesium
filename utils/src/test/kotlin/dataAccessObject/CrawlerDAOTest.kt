@@ -46,14 +46,7 @@ class CrawlerDAOTest {
   assertEquals(result, sameResult)
  }
 
- @Test
- fun testStorePageKeywords() {
-  val pageId = "page1"
-  val keywords = listOf("keyword1", "keyword2")
-  crawlerDAO.storePageKeywords(pageId, keywords)
-  val storedKeywords = forwardIndex[pageId] as? List<String>
-  assertEquals(keywords, storedKeywords)
- }
+
 
  @Test
  fun testGetPageIdForUrl() {
