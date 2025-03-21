@@ -71,6 +71,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueued ${links.size} child URLs for further crawling" }
     }
 
+    /*
     /**
      * Given a list of keywords, compute frequencies (word -> count).
      */
@@ -83,6 +84,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         logger.debug { "[CrawlerService:computeKeywordFrequencies] Computed frequencies for ${freqMap.size} unique keywords" }
         return freqMap
     }
+    */
 
     /**
      * Create a Page object aligned with your data model, then store it with the DAO.
