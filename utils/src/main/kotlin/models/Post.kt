@@ -2,8 +2,8 @@ package models
 
 import java.io.Serializable
 
-data class Post(
-    val pageId: String,
+data class Post (
+    val pageID: String,
     val frequency: Int,
-    val positions: List<Int>
+    val position: List<Int>,
 ) : Serializable

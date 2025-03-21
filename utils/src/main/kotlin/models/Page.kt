@@ -1,7 +1,7 @@
 package models
 
 data class Page(
-    val id: Long,
+    val id: String,
     val url: String,
     val title: String? = null,
     val content: String = "",
