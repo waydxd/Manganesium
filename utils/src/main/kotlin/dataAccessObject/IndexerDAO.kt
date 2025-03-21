@@ -6,24 +6,38 @@ import java.util.*
 
 class IndexerDAO(db: DB) : DatabaseManager(db) {
 
-    // Update inverted index
+    /**
+     * Store the wordID to keyword mapping
+     * @param keyword, wordId
+     */
     fun storeInvertedTitle(keyword: Post, wordId: String) {
         val pages = invertedTitle[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(keyword)
         invertedTitle[wordId] = pages
     }
+
+    /**
+     * Store the wordID to keyword mapping
+     * @param keyword, wordId
+     */
     fun storeInvertedBody(keyword: Post, wordId: String) {
         val pages = invertedBody[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(keyword)
         invertedBody[wordId] = pages
     }
 
-    // Retrieve pages body for a
+    /**
+     * get the pages body for a keyword
+     * @param wordId
+     */
     fun getPagesBodyForKeyword(wordId: String): List<String> {
         return invertedBody[wordId] as? List<String> ?: emptyList()
     }
 
-    // Retrieve pages title for a keyword
+    /**
+     * get the pages title for a keyword
+     * @param wordId
+     */
     fun getPagesTitleForKeyword(wordId: String): List<String> {
         return invertedTitle[wordId] as? List<String> ?: emptyList()
     }
@@ -38,7 +52,10 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         return stopWords.toSet()
     }
 
-    // WordID to Word mapping and return the word ID
+    /**
+     * Store the word to wordID mapping
+     * @param word
+     */
     fun storeWordIdToWordMapping(word: String): String {
         val existingWordId = wordToWordID[word]
         if (existingWordId != null) {
@@ -50,8 +67,10 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         return newWordId
     }
 
-    // Retrieve word for a word ID
-    fun getWordForWordId(wordId: String): String? {
-        return wordToWordID[wordId]
+    /**
+     * Get the wordID using keyword
+     */
+    fun getWordForWordId(keyword: String): String? {
+        return wordToWordID[keyword]
     }
 }
