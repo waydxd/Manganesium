@@ -4,10 +4,18 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.util.concurrent.ConcurrentLinkedQueue
+import org.manganesium.crawler.services.CrawlerService
+import dataAccessObject.CrawlerDAO
 
 private val logger = KotlinLogging.logger {}
 
-class Crawler {
+class Crawler(private val crawlerDAO: CrawlerDAO) {
+    val visitedUrls = mutableSetOf<String>()
+    val urlQueue = ConcurrentLinkedQueue<String>()
+
+    // Create our own reference to CrawlerService with the DAO passed in
+    private val crawlerService = CrawlerService(crawlerDAO, this)
 
     /**
      * Fetch the HTML content of the given URL using Jsoup.
@@ -46,6 +54,46 @@ class Crawler {
     }
 
     /**
+     * Starts the crawling process from the given start URLs,
+     * with an optional maxDepth for BFS traversal.
+     *
+     * @param startUrls URLs to begin crawling from
+     * @param maxDepth Number of levels to traverse
+     */
+    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int) {
+        logger.info { "[Crawler:startCrawling] Starting crawling process with ${startUrls.size} start URLs and maxDepth=$maxDepth" }
+
+        // Initialize the queue
+        urlQueue.addAll(startUrls)
+
+        var currentDepth = 0
+        while (currentDepth < maxDepth && urlQueue.isNotEmpty() && visitedUrls.size < maxPages ) {
+            logger.debug { "[Crawler:startCrawling] Processing depth level $currentDepth" }
+
+            val levelSize = urlQueue.size
+            repeat(levelSize) {
+                val url = urlQueue.poll() ?: return@repeat
+                if (!visitedUrls.contains(url)) {
+                    visitedUrls.add(url)
+                    logger.debug { "[Crawler:startCrawling] Crawling URL: $url" }
+                    crawlerService.crawlSinglePage(url)
+                }
+            }
+            currentDepth++
+        }
+
+        logger.info { "[Crawler:startCrawling] Crawling process completed. Visited ${visitedUrls.size} URLs." }
+    }
+
+    /**
+     * Close the underlying data access object
+     */
+    fun close() {
+        crawlerDAO.close()
+    }
+
+    /*
+    /**
      * Extract keywords from the document by naive splitting on whitespace.
      * A real application might:
      * - Tokenize more robustly
@@ -62,4 +110,5 @@ class Crawler {
         logger.debug { "[Crawler:extractKeywords] Extracted ${keywords.size} keywords from the document" }
         return keywords
     }
+    */
 }

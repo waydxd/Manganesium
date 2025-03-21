@@ -6,54 +6,16 @@ import org.jsoup.nodes.Document
 import org.manganesium.crawler.Crawler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executors
 
 private val logger = KotlinLogging.logger {}
 
-class CrawlerService(val crawlerDAO: CrawlerDAO) {
-    val crawler = Crawler()
-    val visitedUrls = mutableSetOf<String>()
-    val urlQueue = ConcurrentLinkedQueue<String>()
-
-    /**
-     * Starts the crawling process from the given start URLs,
-     * with an optional maxDepth for BFS traversal.
-     *
-     * @param startUrls URLs to begin crawling from
-     * @param maxDepth Number of levels to traverse
-     */
-    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int) {
-        logger.info { "[CrawlerService:startCrawling] Starting crawling process with ${startUrls.size} start URLs and maxDepth=$maxDepth" }
-
-        // Initialize the queue
-        urlQueue.addAll(startUrls)
-
-        var currentDepth = 0
-        while (currentDepth < maxDepth && urlQueue.isNotEmpty() && visitedUrls.size < maxPages ) {
-            logger.debug { "[CrawlerService:startCrawling] Processing depth level $currentDepth" }
-
-            val levelSize = urlQueue.size
-            repeat(levelSize) {
-                val url = urlQueue.poll() ?: return@repeat
-                if (!visitedUrls.contains(url)) {
-                    visitedUrls.add(url)
-                    logger.debug { "[CrawlerService:startCrawling] Crawling URL: $url" }
-                    crawlSinglePage(url)
-                }
-            }
-            currentDepth++
-        }
-
-        logger.info { "[CrawlerService:startCrawling] Crawling process completed. Visited ${visitedUrls.size} URLs." }
-    }
-
+class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
     /**
      * Crawl a single page (fetch, parse, store in DB, enqueue child links).
      *
      * @param url The page URL to crawl
      */
-    private fun crawlSinglePage(url: String) {
+    fun crawlSinglePage(url: String) {
         logger.debug { "[CrawlerService:crawlSinglePage] Fetching document from URL: $url" }
         val document = crawler.fetchPage(url) ?: run {
             logger.error { "[CrawlerService:crawlSinglePage] Failed to fetch document from URL: $url" }
@@ -64,6 +26,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
         val pageId = crawlerDAO.storeUrlToPageIdMapping(url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored URL to page ID mapping. Page ID: $pageId" }
 
+        /*
         // Extract raw word list from the Document
         logger.debug { "[CrawlerService:crawlSinglePage] Extracting keywords from document" }
         val rawKeywords = crawler.extractKeywords(document)
@@ -78,6 +41,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
         logger.debug { "[CrawlerService:crawlSinglePage] Storing page keywords in forward index" }
         crawlerDAO.storePageKeywords(pageId, rawKeywords)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page keywords in forward index" }
+        */
 
         // Extract links
         logger.debug { "[CrawlerService:crawlSinglePage] Extracting links from document" }
@@ -98,12 +62,12 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
 
         // Build and store the Page model
         logger.debug { "[CrawlerService:crawlSinglePage] Storing page properties" }
-        storePageProperties(pageId, document, keywordFrequencies, links, url)
+        storePageProperties(pageId, document, links, url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page properties" }
 
         // Enqueue child links for further crawling
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueuing child URLs for further crawling" }
-        links.forEach { if (!visitedUrls.contains(it)) urlQueue.offer(it) }
+        links.forEach { if (!crawler.visitedUrls.contains(it)) crawler.urlQueue.offer(it) }
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueued ${links.size} child URLs for further crawling" }
     }
 
@@ -126,7 +90,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
     private fun storePageProperties(
         pageId: String,
         doc: Document,
-        keywordFrequencies: Map<String, Int>,
+        //keywordFrequencies: Map<String, Int>,
         links: List<String>,
         url: String
     ) {
@@ -143,52 +107,12 @@ class CrawlerService(val crawlerDAO: CrawlerDAO) {
             content = content,
             lastModified = lastModified,
             size = size,
-            keywords = keywordFrequencies,
+            //keywords = keywordFrequencies,
             links = links
         )
 
         logger.debug { "[CrawlerService:storePageProperties] Storing Page object in DAO" }
         crawlerDAO.storePageProperties(pageId, page)
         logger.debug { "[CrawlerService:storePageProperties] Stored Page object in DAO" }
-    }
-
-    /**
-     * Demonstration of a concurrent approach (optional).
-     * BFS with a thread pool, for those who want parallel crawling.
-     */
-    fun startCrawlingConcurrently(startUrls: List<String>, maxThreads: Int = 4, maxDepth: Int = 2) {
-        logger.info { "[CrawlerService:startCrawlingConcurrently] Starting concurrent crawling process with ${startUrls.size} start URLs, maxThreads=$maxThreads, and maxDepth=$maxDepth" }
-
-        val executor = Executors.newFixedThreadPool(maxThreads)
-        urlQueue.addAll(startUrls)
-
-        var currentDepth = 0
-        while (currentDepth < maxDepth && urlQueue.isNotEmpty()) {
-            logger.debug { "[CrawlerService:startCrawlingConcurrently] Processing depth level $currentDepth" }
-
-            val levelSize = urlQueue.size
-            repeat(levelSize) {
-                val url = urlQueue.poll() ?: return@repeat
-                executor.execute {
-                    if (!visitedUrls.contains(url)) {
-                        visitedUrls.add(url)
-                        logger.debug { "[CrawlerService:startCrawlingConcurrently] Crawling URL: $url" }
-                        crawlSinglePage(url)
-                    }
-                }
-            }
-            currentDepth++
-        }
-
-        // Shut down the executor once done
-        executor.shutdown()
-        logger.info { "[CrawlerService:startCrawlingConcurrently] Concurrent crawling process completed. Visited ${visitedUrls.size} URLs." }
-    }
-
-    /**
-     * Cleanly close the DAO once crawling is complete.
-     */
-    fun close() {
-        crawlerDAO.close()
     }
 }
