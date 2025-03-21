@@ -7,6 +7,6 @@ data class Page(
     val content: String = "",
     val lastModified: String? = null,
     val size: Int = 0,
-    val keywords: Map<String, Int> = emptyMap(),
+    //val keywords: Map<String, Int> = emptyMap(),
     val links: List<String> = emptyList()
 )
