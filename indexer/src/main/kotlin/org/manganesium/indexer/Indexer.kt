@@ -2,7 +2,7 @@ package org.manganesium.indexer;
 
 import models.Page
 import models.Post
-import org.manganesium.dataAccessObject.IndexerDAO
+import dataAccessObject.IndexerDAO
 
 public class Indexer {
     private val kwP = KeywordProcessor()
