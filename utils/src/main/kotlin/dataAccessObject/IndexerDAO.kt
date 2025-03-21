@@ -25,7 +25,7 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         val pages = invertedTitle[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(post)
         invertedTitle[wordId] = pages
-        debugValidatePages(wordId)
+//        debugValidatePages(wordId)
     }
 
     fun storeInvertedBody(wordId: String, post: Post) {
@@ -34,7 +34,7 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         pages.add(post)
         logger.debug { "Stored inverted body for wordId: $wordId: $pages" }
         invertedBody[wordId] = pages
-        debugValidatePages(wordId)
+//        debugValidatePages(wordId)
     }
 
     fun getPagesBodyForKeyword(wordId: String): List<Post> {

@@ -1,4 +1,0 @@
-package shared
-
-class HtmlParser {
-}
