@@ -1,29 +1,31 @@
 package org.manganesium.dataAccessObject
 
+import models.Post
 import org.mapdb.DB
 import java.util.*
 
 class IndexerDAO(db: DB) : DatabaseManager(db) {
+
     // Update inverted index
-    fun storeInvertedTitle(keyword: String, pageId: String) {
-        val pages = invertedTitle[keyword] as? MutableSet<String> ?: mutableSetOf()
-        pages.add(pageId)
-        invertedTitle[keyword] = pages
+    fun storeInvertedTitle(keyword: Post, wordId: String) {
+        val pages = invertedTitle[wordId] as? MutableSet<Post> ?: mutableSetOf()
+        pages.add(keyword)
+        invertedTitle[wordId] = pages
     }
-    fun storeInvertedBody(keyword: String, pageId: String) {
-        val pages = invertedBody[keyword] as? MutableSet<String> ?: mutableSetOf()
-        pages.add(pageId)
-        invertedBody[keyword] = pages
+    fun storeInvertedBody(keyword: Post, wordId: String) {
+        val pages = invertedBody[wordId] as? MutableSet<Post> ?: mutableSetOf()
+        pages.add(keyword)
+        invertedBody[wordId] = pages
     }
 
-    // Retrieve pages body for a keyword
-    fun getPagesBodyForKeyword(keyword: String): List<String> {
-        return invertedBody[keyword] as? List<String> ?: emptyList()
+    // Retrieve pages body for a
+    fun getPagesBodyForKeyword(wordId: String): List<String> {
+        return invertedBody[wordId] as? List<String> ?: emptyList()
     }
 
     // Retrieve pages title for a keyword
-    fun getPagesTitleForKeyword(keyword: String): List<String> {
-        return invertedTitle[keyword] as? List<String> ?: emptyList()
+    fun getPagesTitleForKeyword(wordId: String): List<String> {
+        return invertedTitle[wordId] as? List<String> ?: emptyList()
     }
 
     // Store stop words
