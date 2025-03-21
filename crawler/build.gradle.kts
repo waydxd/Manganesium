@@ -17,6 +17,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3") // Kotlin logging dependency
     implementation("org.slf4j:slf4j-api:2.0.3") // SLF4J dependency
     implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation(project(":indexer"))
 }
 
 tasks.test {

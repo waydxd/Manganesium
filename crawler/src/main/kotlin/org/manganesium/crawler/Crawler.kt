@@ -7,6 +7,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.concurrent.ConcurrentLinkedQueue
 import org.manganesium.crawler.services.CrawlerService
 import dataAccessObject.CrawlerDAO
+import org.manganesium.indexer.Indexer
 
 private val logger = KotlinLogging.logger {}
 
@@ -59,8 +60,10 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
      *
      * @param startUrls URLs to begin crawling from
      * @param maxDepth Number of levels to traverse
+     * @param maxPages Maximum number of pages to crawl
+     * @param indexer The indexer instance to use for indexing pages
      */
-    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int) {
+    fun startCrawling(startUrls: List<String>, maxDepth: Int, maxPages: Int, indexer: Indexer) {
         logger.info { "[Crawler:startCrawling] Starting crawling process with ${startUrls.size} start URLs and maxDepth=$maxDepth" }
 
         // Initialize the queue
@@ -76,7 +79,7 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
                 if (!visitedUrls.contains(url)) {
                     visitedUrls.add(url)
                     logger.debug { "[Crawler:startCrawling] Crawling URL: $url" }
-                    crawlerService.crawlSinglePage(url)
+                    crawlerService.crawlSinglePage(url, indexer)
                 }
             }
             currentDepth++

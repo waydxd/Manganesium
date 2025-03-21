@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document
 import org.manganesium.crawler.Crawler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
+import org.manganesium.indexer.Indexer
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,8 +15,9 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
      * Crawl a single page (fetch, parse, store in DB, enqueue child links).
      *
      * @param url The page URL to crawl
+     * @param indexer The indexer to use for indexing the page
      */
-    fun crawlSinglePage(url: String) {
+    fun crawlSinglePage(url: String, indexer: Indexer) {
         logger.debug { "[CrawlerService:crawlSinglePage] Fetching document from URL: $url" }
         val document = crawler.fetchPage(url) ?: run {
             logger.error { "[CrawlerService:crawlSinglePage] Failed to fetch document from URL: $url" }
@@ -25,23 +27,6 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         logger.debug { "[CrawlerService:crawlSinglePage] Storing URL to page ID mapping for URL: $url" }
         val pageId = crawlerDAO.storeUrlToPageIdMapping(url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored URL to page ID mapping. Page ID: $pageId" }
-
-        /*
-        // Extract raw word list from the Document
-        logger.debug { "[CrawlerService:crawlSinglePage] Extracting keywords from document" }
-        val rawKeywords = crawler.extractKeywords(document)
-        logger.debug { "[CrawlerService:crawlSinglePage] Extracted ${rawKeywords.size} raw keywords from the document" }
-
-        // Convert it to a frequency map
-        logger.debug { "[CrawlerService:crawlSinglePage] Computing keyword frequencies" }
-        val keywordFrequencies = computeKeywordFrequencies(rawKeywords)
-        logger.debug { "[CrawlerService:crawlSinglePage] Computed keyword frequencies for ${keywordFrequencies.size} unique keywords" }
-
-        // (Optional) store keywords in forward index
-        logger.debug { "[CrawlerService:crawlSinglePage] Storing page keywords in forward index" }
-        crawlerDAO.storePageKeywords(pageId, rawKeywords)
-        logger.debug { "[CrawlerService:crawlSinglePage] Stored page keywords in forward index" }
-        */
 
         // Extract links
         logger.debug { "[CrawlerService:crawlSinglePage] Extracting links from document" }
@@ -62,14 +47,20 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
 
         // Build and store the Page model
         logger.debug { "[CrawlerService:crawlSinglePage] Storing page properties" }
-        storePageProperties(pageId, document, links, url)
+        val page = storePageProperties(pageId, document, links, url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page properties" }
+
+        // Index the page after extracting links and storing page properties
+        logger.debug { "[CrawlerService:crawlSinglePage] Indexing page content" }
+        indexer.indexPage(page)
+        logger.debug { "[CrawlerService:crawlSinglePage] Indexed page content" }
 
         // Enqueue child links for further crawling
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueuing child URLs for further crawling" }
         links.forEach { if (!crawler.visitedUrls.contains(it)) crawler.urlQueue.offer(it) }
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueued ${links.size} child URLs for further crawling" }
     }
+
 
     /*
     /**
@@ -88,33 +79,34 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
 
     /**
      * Create a Page object aligned with your data model, then store it with the DAO.
+     * Returns the created Page object for potential indexing.
      */
     private fun storePageProperties(
         pageId: String,
         doc: Document,
-        //keywordFrequencies: Map<String, Int>,
         links: List<String>,
         url: String
-    ) {
+    ): Page {
         logger.debug { "[CrawlerService:storePageProperties] Creating Page object for URL: $url" }
-        val title = doc.title().takeIf { it.isNotBlank() }
+        val title = doc.title().takeIf { it.isNotBlank() } ?: ""
         val content = doc.body()?.text() ?: ""
         val lastModified = Instant.now().toString()
         val size = doc.outerHtml().length
 
         val page = Page(
-            id = 0L,
+            id = pageId,
             url = url,
             title = title,
             content = content,
             lastModified = lastModified,
             size = size,
-            //keywords = keywordFrequencies,
             links = links
         )
 
         logger.debug { "[CrawlerService:storePageProperties] Storing Page object in DAO" }
         crawlerDAO.storePageProperties(pageId, page)
         logger.debug { "[CrawlerService:storePageProperties] Stored Page object in DAO" }
+
+        return page
     }
 }

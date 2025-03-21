@@ -2,6 +2,7 @@ package org.manganesium.crawler
 
 import dataAccessObject.CrawlerDAO
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.manganesium.indexer.Indexer
 
 private val logger = KotlinLogging.logger {}
 
@@ -10,6 +11,9 @@ fun main() {
 
     // Initialize DAO with a path to a DB file
     val crawlerDao = CrawlerDAO("crawler.db")
+
+    // Create the indexer
+    val indexer = Indexer()
 
     // Create the crawler (which internally creates the service)
     val crawler = Crawler(crawlerDao)
@@ -21,7 +25,7 @@ fun main() {
 
     // Start crawling directly from crawler
     logger.info { "[Main:main] Starting the crawling process" }
-    crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 30)
+    crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 30, indexer)
 
     // Close the DAO to commit and release resources
     crawler.close()
