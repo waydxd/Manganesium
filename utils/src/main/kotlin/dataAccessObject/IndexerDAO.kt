@@ -1,16 +1,29 @@
 package org.manganesium.dataAccessObject
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import models.Post
 import org.mapdb.DB
+import org.mapdb.DBMaker
+import java.io.File
 import java.util.*
 
 class IndexerDAO(db: DB) : DatabaseManager(db) {
+    private val logger = KotlinLogging.logger {}
+
+    constructor(dbFile: File) : this(
+        DBMaker.fileDB(dbFile)
+            .fileMmapEnable()
+            .closeOnJvmShutdown()
+            .make()
+    )
+
+    constructor(dbPath: String) : this(File(dbPath))
 
     /**
      * Store the wordID to keyword mapping
      * @param keyword, wordId
      */
-    fun storeInvertedTitle(keyword: Post, wordId: String) {
+    fun storeInvertedTitle(wordId: String, keyword: Post) {
         val pages = invertedTitle[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(keyword)
         invertedTitle[wordId] = pages
@@ -20,7 +33,7 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
      * Store the wordID to keyword mapping
      * @param keyword, wordId
      */
-    fun storeInvertedBody(keyword: Post, wordId: String) {
+    fun storeInvertedBody(wordId: String, keyword: Post) {
         val pages = invertedBody[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(keyword)
         invertedBody[wordId] = pages
