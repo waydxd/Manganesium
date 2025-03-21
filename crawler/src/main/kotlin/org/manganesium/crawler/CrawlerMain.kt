@@ -12,6 +12,7 @@ fun main() {
     // Initialize DAO with a path to a DB file
     val crawlerDao = CrawlerDAO("crawler.db")
 
+    // File("indexer.db").delete()
     // Create the indexer
     val indexer = Indexer()
 
