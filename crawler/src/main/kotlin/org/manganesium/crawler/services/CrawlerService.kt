@@ -66,6 +66,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
             } catch (e: Exception) {
                 logger.error { "[CrawlerService:crawlSinglePage - Thread] Failed to index page: $url, error: ${e.message}" }
             }
+            indexer.indexerClose()
         }
 
         // Enqueue child links for further crawling

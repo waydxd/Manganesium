@@ -27,6 +27,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    val agentJar = configurations.testRuntimeClasspath.get()
+        .firstOrNull { it.name.contains("byte-buddy-agent") }
+        ?.absolutePath
+    if (agentJar != null) {
+        jvmArgs("-javaagent:$agentJar")
+    }
 }
 kotlin {
     jvmToolchain(23)

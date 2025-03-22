@@ -32,9 +32,6 @@ tasks.test {
     }
 }
 
-//tasks.withType<Test> {
-//    jvmArgs = listOf("-javaagent:${configurations.testRuntimeClasspath.get().asPath}")
-//}
 kotlin {
     jvmToolchain(23)
 }

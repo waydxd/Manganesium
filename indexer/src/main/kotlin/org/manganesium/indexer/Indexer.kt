@@ -61,4 +61,8 @@ class Indexer {
         // Store only top 10 Keyword objects in the forward index.
         indexerDao.storePageKeywords(p.id, topKeywords)
     }
+
+    fun indexerClose() {
+        indexerDao.close()
+    }
 }
