@@ -29,5 +29,5 @@ tasks.named<JavaExec>("run") {
 }
 application {
     // Fully qualified name of the class containing the main function
-    mainClass.set("org.manganesium.crawler.CrawlerMainKt")
+    mainClass.set("app.MainKt")
 }
