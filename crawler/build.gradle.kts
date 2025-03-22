@@ -22,6 +22,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.1")
     // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
     testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 }
 
 tasks.test {
