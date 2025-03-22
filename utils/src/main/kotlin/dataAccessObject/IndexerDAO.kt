@@ -22,20 +22,15 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
     constructor(dbPath: String) : this(File(dbPath))
 
     fun storeInvertedTitle(wordId: String, post: Post) {
-        logger.info { "Storing inverted title for wordId: $wordId with post: $post" }
         val pages = invertedTitle[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(post)
         invertedTitle[wordId] = pages
-//        debugValidatePages(wordId)
     }
 
     fun storeInvertedBody(wordId: String, post: Post) {
-        logger.info { "Storing inverted body for wordId: $wordId with post: $post" }
         val pages = invertedBody[wordId] as? MutableSet<Post> ?: mutableSetOf()
         pages.add(post)
-        logger.debug { "Stored inverted body for wordId: $wordId: $pages" }
         invertedBody[wordId] = pages
-//        debugValidatePages(wordId)
     }
 
     fun getPagesBodyForKeyword(wordId: String): List<Post> {
@@ -59,7 +54,6 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
     }
 
     fun storeWordIdToWordMapping(word: String): String {
-        logger.info { "Storing word to wordId mapping for word: $word" }
         val existingWordId = wordToWordID[word]
         if (existingWordId != null) {
             logger.info { "WordId already exists for word: $word, wordId: $existingWordId" }
@@ -84,7 +78,6 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
 
     // Store page keywords
     fun storePageKeywords(pageId: String, keywords: List<Keyword>) {
-        logger.debug { "[CrawlerDAO:storePageKeywords] Storing ${keywords.size} keywords for page ID: $pageId" }
         forwardIndex[pageId] = keywords
     }
 

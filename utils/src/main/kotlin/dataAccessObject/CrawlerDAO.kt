@@ -30,7 +30,6 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
 
         // Generate a new unique page ID
         val newPageId = java.util.UUID.randomUUID().toString()
-        logger.debug { "[CrawlerDAO:storeUrlToPageIdMapping] Generated new page ID for URL: $url -> $newPageId" }
 
         // Store the URL to page ID mapping
         urlToPageId[url] = newPageId
@@ -47,7 +46,6 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
 
     // Store parent/child links
     fun storeParentChildLinks(parentPageId: String, childPageIds: List<String>) {
-        logger.debug { "[CrawlerDAO:storeParentChildLinks] Storing ${childPageIds.size} child links for parent page ID: $parentPageId" }
         parentChildLinks[parentPageId] = childPageIds
     }
 
@@ -60,7 +58,6 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
 
     // Store page properties
     fun storePageProperties(pageId: String, page: Page) {
-        logger.debug { "[CrawlerDAO:storePageProperties] Storing properties for page ID: $pageId, title: ${page.title}" }
         val properties = mapOf(
             "title" to page.title.toString(),
             "lastModified" to page.lastModified,
