@@ -13,15 +13,39 @@ import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
+/**
+ * Service class responsible for crawling individual pages, parsing content,
+ * storing page properties in the database, and indexing page content.
+ *
+ * This class collaborates with the [Crawler] (which supplies methods for fetching
+ * and link extraction), the [CrawlerDAO] (for persistent storage), and the [Indexer]
+ * (to perform search indexing on the crawled pages). Additionally, it makes use of a thread
+ * pool executor to offload indexing tasks, allowing for asynchronous processing.
+ *
+ * @property crawlerDAO The data access object for persistence operations.
+ * @property crawler The crawler instance used to fetch pages and extract links.
+ */
 class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
     // Thread pool for indexing tasks
     private val executor: ExecutorService = Executors.newFixedThreadPool(5) // Adjust pool size as needed
 
     /**
-     * Crawl a single page (fetch, parse, store in DB, enqueue child links).
+     * Crawls a single page: fetches the page, extracts links, stores mappings and relationships,
+     * creates a [Page] object from the document, and submits an asynchronous indexing task.
      *
-     * @param url The page URL to crawl
-     * @param indexer The indexer to use for indexing the page
+     * Steps performed:
+     * 1. Fetch the page from the given URL.
+     * 2. If fetching fails (i.e. returns null), log the failure and return immediately.
+     * 3. Store the URL-to-page ID mapping in the DAO.
+     * 4. Extract all child links from the document.
+     * 5. Store child link mappings and the parent-child relationships.
+     * 6. Create a [Page] object using extracted properties (title, content, last modified, size, etc.),
+     *    and store it in the DAO.
+     * 7. Submit an asynchronous task to index the page using the provided [Indexer].
+     * 8. Enqueue all extracted child URLs for further crawling, if they haven't already been visited.
+     *
+     * @param url The URL of the page to be crawled.
+     * @param indexer The indexer instance used to index the page content.
      */
     fun crawlSinglePage(url: String, indexer: Indexer) {
         logger.debug { "[CrawlerService:crawlSinglePage] Fetching document from URL: $url" }
@@ -79,8 +103,17 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
     }
 
     /**
-     * Create a Page object aligned with your data model, then store it with the DAO.
-     * Returns the created Page object for potential indexing.
+     * Creates a [Page] object from the provided document and properties, then stores it into the DAO.
+     *
+     * This method extracts the title, content, last modified timestamp, and size of the page,
+     * and uses these properties along with the page's URL and link list to create a [Page] instance.
+     * The size is determined by the length of the HTML content (using `doc.outerHtml().length`).
+     *
+     * @param pageId The unique identifier assigned to the page.
+     * @param doc The Jsoup [Document] representing the fetched HTML page.
+     * @param links A list of URLs extracted from the document.
+     * @param url The original URL of the page.
+     * @return The created [Page] object which is also stored via the DAO.
      */
     private fun storePageProperties(
         pageId: String,
@@ -112,7 +145,11 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
     }
 
     /**
-     * Shutdown the executor and wait for all indexing tasks to complete.
+     * Shuts down the executor service and waits for all indexing tasks to complete.
+     *
+     * This method attempts to gracefully shut down the thread pool that is used to execute
+     * indexing tasks. It stops accepting new tasks and waits up to 60 seconds for existing tasks
+     * to terminate. If the tasks do not finish within the timeout, it forces a shutdown.
      */
     fun shutdown() {
         executor.shutdown() // Stop accepting new tasks
