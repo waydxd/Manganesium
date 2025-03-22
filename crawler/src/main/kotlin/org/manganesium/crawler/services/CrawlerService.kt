@@ -11,6 +11,7 @@ import org.manganesium.indexer.Indexer
 private val logger = KotlinLogging.logger {}
 
 class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
+
     /**
      * Crawl a single page (fetch, parse, store in DB, enqueue child links).
      *
@@ -24,6 +25,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
             return
         }
 
+        // Store URL -> pageID
         logger.debug { "[CrawlerService:crawlSinglePage] Storing URL to page ID mapping for URL: $url" }
         val pageId = crawlerDAO.storeUrlToPageIdMapping(url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored URL to page ID mapping. Page ID: $pageId" }
@@ -50,32 +52,24 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         val page = storePageProperties(pageId, document, links, url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page properties" }
 
-        // Index the page after extracting links and storing page properties
-        logger.debug { "[CrawlerService:crawlSinglePage] Indexing page content" }
-        indexer.indexPage(page)
-        logger.debug { "[CrawlerService:crawlSinglePage] Indexed page content" }
+        // -------------------------------------------------------------
+        // Perform indexing in a new thread so the crawler does not wait.
+        // -------------------------------------------------------------
+        Thread {
+            logger.debug { "[CrawlerService:crawlSinglePage - Thread] Indexing page content on a separate thread." }
+            indexer.indexPage(page)
+            logger.debug { "[CrawlerService:crawlSinglePage - Thread] Finished indexing page content." }
+        }.start()
 
         // Enqueue child links for further crawling
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueuing child URLs for further crawling" }
-        links.forEach { if (!crawler.visitedUrls.contains(it)) crawler.urlQueue.offer(it) }
+        links.forEach {
+            if (!crawler.visitedUrls.contains(it)) {
+                crawler.urlQueue.offer(it)
+            }
+        }
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueued ${links.size} child URLs for further crawling" }
     }
-
-
-    /*
-    /**
-     * Given a list of keywords, compute frequencies (word -> count).
-     */
-    private fun computeKeywordFrequencies(words: List<String>): Map<String, Int> {
-        logger.debug { "[CrawlerService:computeKeywordFrequencies] Computing keyword frequencies for ${words.size} words" }
-        val freqMap = mutableMapOf<String, Int>()
-        for (word in words) {
-            freqMap[word] = freqMap.getOrDefault(word, 0) + 1
-        }
-        logger.debug { "[CrawlerService:computeKeywordFrequencies] Computed frequencies for ${freqMap.size} unique keywords" }
-        return freqMap
-    }
-    */
 
     /**
      * Create a Page object aligned with your data model, then store it with the DAO.

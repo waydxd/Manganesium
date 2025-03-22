@@ -70,11 +70,14 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
         urlQueue.addAll(startUrls)
 
         var currentDepth = 0
-        while (currentDepth < maxDepth && urlQueue.isNotEmpty() && visitedUrls.size < maxPages ) {
+        while (currentDepth < maxDepth && urlQueue.isNotEmpty() && visitedUrls.size < maxPages) {
             logger.debug { "[Crawler:startCrawling] Processing depth level $currentDepth" }
 
             val levelSize = urlQueue.size
             repeat(levelSize) {
+                // If we already hit maxPages, we can break out early
+                if (visitedUrls.size >= maxPages) return@repeat
+
                 val url = urlQueue.poll() ?: return@repeat
                 if (!visitedUrls.contains(url)) {
                     visitedUrls.add(url)
@@ -94,24 +97,4 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
     fun close() {
         crawlerDAO.close()
     }
-
-    /*
-    /**
-     * Extract keywords from the document by naive splitting on whitespace.
-     * A real application might:
-     * - Tokenize more robustly
-     * - Handle punctuation and special characters
-     * - Filter out stop words, etc.
-     */
-    fun extractKeywords(doc: Document): List<String> {
-        logger.debug { "[Crawler:extractKeywords] Extracting keywords from document" }
-        val textContent = doc.body()?.text() ?: ""
-        val keywords = textContent
-            .split("\\s+".toRegex())
-            .map { it.lowercase() }
-            .filter { it.isNotBlank() }
-        logger.debug { "[Crawler:extractKeywords] Extracted ${keywords.size} keywords from the document" }
-        return keywords
-    }
-    */
 }
