@@ -4,7 +4,7 @@ import models.Page
 import models.Post
 import dataAccessObject.IndexerDAO
 
-public class Indexer {
+class Indexer {
     private val kwP = KeywordProcessor()
     private val indexerDao = IndexerDAO("indexer.db")
 
@@ -14,19 +14,36 @@ public class Indexer {
      * @param p Page object
      */
     fun indexPage(p: Page) {
-        val word_freq_T = kwP.stopAndStem(p.title)
-        val word_freq_B = kwP.stopAndStem(p.content)
+        val wordFreqT = kwP.stopAndStem(p.title)
+        val wordFreqB = kwP.stopAndStem(p.content)
         val dummy: List<Int> = ArrayList<Int>()
 
-        for (i in word_freq_T) {
-            val wordID = indexerDao.storeWordIdToWordMapping(i.key) // word <=> wordID
-            indexerDao.storeInvertedTitle(wordID, Post(p.id.toString(), i.value, dummy))    // inverted title
+        // Save inverted indexes
+        for ((word, freq) in wordFreqT) {
+            val wordID = indexerDao.storeWordIdToWordMapping(word)
+            indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
         }
-        for (i in word_freq_B) {
-            val wordID = indexerDao.storeWordIdToWordMapping(i.key)
-            indexerDao.storeInvertedTitle(wordID, Post(p.id.toString(), i.value, dummy))    // inverted body
+        for ((word, freq) in wordFreqB) {
+            val wordID = indexerDao.storeWordIdToWordMapping(word)
+            indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
         }
 
-        indexerDao.storePageKeywords(p.id.toString(), word_freq_T.keys.union(word_freq_B.keys).toList())    // forward
+        // Combine frequencies from title and content.
+        val combinedFreq = mutableMapOf<String, Int>()
+        for ((word, freq) in wordFreqT) {
+            combinedFreq[word] = combinedFreq.getOrDefault(word, 0) + freq
+        }
+        for ((word, freq) in wordFreqB) {
+            combinedFreq[word] = combinedFreq.getOrDefault(word, 0) + freq
+        }
+
+        // Take top 10 keywords based on frequency.
+        val topKeywords = combinedFreq.entries
+            .sortedByDescending { it.value }
+            .take(10)
+            .map { it.key }
+
+        // Store only top 10 keywords in the forward index.
+        indexerDao.storePageKeywords(p.id, topKeywords)
     }
 }
