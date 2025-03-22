@@ -62,7 +62,7 @@ class Indexer {
         indexerDao.storePageKeywords(p.id, topKeywords)
     }
 
-    fun indexerClose() {
+    fun close() {
         indexerDao.close()
     }
 }

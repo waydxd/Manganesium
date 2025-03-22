@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm") version "2.1.10"
-    application
 }
 
 group = "org.manganesium.crawler"
@@ -36,8 +35,4 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(23)
-}
-application {
-    // Fully qualified name of the class containing the main function
-    mainClass.set("org.manganesium.crawler.CrawlerMainKt")
 }

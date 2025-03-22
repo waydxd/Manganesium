@@ -34,6 +34,7 @@ fun main() {
 
     // Close the DAO to commit and release resources
     crawler.close()
+    indexer.close()
 
     logger.info { "[Main:main] Crawling and indexing process completed" }
     logger.info { "[Main:main] Total pages visited: ${crawler.visitedUrls.size}" }

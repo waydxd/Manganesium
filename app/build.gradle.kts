@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.1.10"
+    application
 }
 
 group = "org.manganesium"
@@ -22,4 +23,11 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(23)
+}
+tasks.named<JavaExec>("run") {
+    workingDir = rootDir
+}
+application {
+    // Fully qualified name of the class containing the main function
+    mainClass.set("org.manganesium.crawler.CrawlerMainKt")
 }
