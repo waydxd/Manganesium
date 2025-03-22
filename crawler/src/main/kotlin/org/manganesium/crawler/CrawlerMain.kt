@@ -12,7 +12,6 @@ fun main() {
     // Initialize DAO with a path to a DB file
     val crawlerDao = CrawlerDAO("crawler.db")
 
-    // File("indexer.db").delete()
     // Create the indexer
     val indexer = Indexer()
 
@@ -24,7 +23,9 @@ fun main() {
         "https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm"
     )
 
-    // Start crawling directly from crawler
+    // Start crawling:
+    //  - maxDepth = 3 (or any depth you need)
+    //  - maxPages = 30 so it stops exactly after 30 pages
     logger.info { "[Main:main] Starting the crawling process" }
     crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 30, indexer)
 
