@@ -1,4 +1,4 @@
-package org.manganesium.indexer;
+package org.manganesium.indexer
 
 import models.Page
 import models.Post
@@ -18,23 +18,35 @@ class Indexer {
         val wordFreqB = kwP.stopAndStem(p.content)
         val dummy: List<Int> = ArrayList<Int>()
 
-        // Save inverted indexes
+        // Save inverted indexes with trimmed keywords
         for ((word, freq) in wordFreqT) {
-            val wordID = indexerDao.storeWordIdToWordMapping(word)
-            indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
+            val trimmedWord = word.trim()
+            if (trimmedWord.isNotEmpty()) {
+                val wordID = indexerDao.storeWordIdToWordMapping(trimmedWord)
+                indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
+            }
         }
         for ((word, freq) in wordFreqB) {
-            val wordID = indexerDao.storeWordIdToWordMapping(word)
-            indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
+            val trimmedWord = word.trim()
+            if (trimmedWord.isNotEmpty()) {
+                val wordID = indexerDao.storeWordIdToWordMapping(trimmedWord)
+                indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
+            }
         }
 
-        // Combine frequencies from title and content.
+        // Combine frequencies from title and content after trimming keywords.
         val combinedFreq = mutableMapOf<String, Int>()
         for ((word, freq) in wordFreqT) {
-            combinedFreq[word] = combinedFreq.getOrDefault(word, 0) + freq
+            val trimmedWord = word.trim()
+            if (trimmedWord.isNotEmpty()) {
+                combinedFreq[trimmedWord] = combinedFreq.getOrDefault(trimmedWord, 0) + freq
+            }
         }
         for ((word, freq) in wordFreqB) {
-            combinedFreq[word] = combinedFreq.getOrDefault(word, 0) + freq
+            val trimmedWord = word.trim()
+            if (trimmedWord.isNotEmpty()) {
+                combinedFreq[trimmedWord] = combinedFreq.getOrDefault(trimmedWord, 0) + freq
+            }
         }
 
         // Take top 10 keywords based on frequency.
