@@ -10,13 +10,13 @@ import java.util.*
 class IndexerMappingTest {
     @Test
     fun testStopwordsAreSavedInWordIdMapping() {
-        val db = DBMaker.fileDB("/Users/wayd/IdeaProjects/COMP4321-Group25/indexer.db").make()
+        val db = DBMaker.fileDB("indexer.db").make()
         try {
             val wordToWordIdMap = db.hashMap("word_to_word_id", Serializer.STRING, Serializer.STRING).createOrOpen()
 
             assertFalse(wordToWordIdMap.isEmpty())
             val stopwords = HashSet<String>()
-            val file = File("/Users/wayd/IdeaProjects/COMP4321-Group25/indexer/src/main/kotlin/org/manganesium/indexer/stopwords.txt")
+            val file = File("indexer/src/main/kotlin/org/manganesium/indexer/stopwords.txt")
             val reader = Scanner(file)
             while (reader.hasNextLine()) {
                 val data = reader.nextLine()
