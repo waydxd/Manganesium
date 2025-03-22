@@ -3,6 +3,7 @@ package org.manganesium.indexer
 import models.Page
 import models.Post
 import dataAccessObject.IndexerDAO
+import models.Keyword
 
 class Indexer {
     private val kwP = KeywordProcessor()
@@ -16,7 +17,7 @@ class Indexer {
     fun indexPage(p: Page) {
         val wordFreqT = kwP.stopAndStem(p.title)
         val wordFreqB = kwP.stopAndStem(p.content)
-        val dummy: List<Int> = ArrayList<Int>()
+        val dummy: List<Int> = ArrayList()
 
         // Save inverted indexes with trimmed keywords
         for ((word, freq) in wordFreqT) {
@@ -30,7 +31,7 @@ class Indexer {
             val trimmedWord = word.trim()
             if (trimmedWord.isNotEmpty()) {
                 val wordID = indexerDao.storeWordIdToWordMapping(trimmedWord)
-                indexerDao.storeInvertedTitle(wordID, Post(p.id, freq, dummy))
+                indexerDao.storeInvertedBody(wordID, Post(p.id, freq, dummy))
             }
         }
 
@@ -49,13 +50,15 @@ class Indexer {
             }
         }
 
-        // Take top 10 keywords based on frequency.
+        // Take top 10 keywords based on frequency and convert them to Keyword objects.
         val topKeywords = combinedFreq.entries
             .sortedByDescending { it.value }
             .take(10)
-            .map { it.key }
+            .map { entry ->
+                Keyword(indexerDao.storeWordIdToWordMapping(entry.key), entry.value)
+            }
 
-        // Store only top 10 keywords in the forward index.
+        // Store only top 10 Keyword objects in the forward index.
         indexerDao.storePageKeywords(p.id, topKeywords)
     }
 }

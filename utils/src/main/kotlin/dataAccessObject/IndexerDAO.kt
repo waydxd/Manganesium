@@ -1,6 +1,7 @@
 package dataAccessObject
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import models.Keyword
 import models.Post
 import org.manganesium.dataAccessObject.DatabaseManager
 import org.mapdb.DB
@@ -66,6 +67,7 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         }
         val newWordId = UUID.randomUUID().toString()
         wordToWordID[word] = newWordId
+        wordIDToWord[newWordId] = word
         logger.info { "Generated new wordId: $newWordId for word: $word" }
         return newWordId
     }
@@ -75,8 +77,13 @@ class IndexerDAO(db: DB) : DatabaseManager(db) {
         return wordToWordID[keyword]
     }
 
+    fun getWordForWordId(wordId: String): String? {
+        logger.info { "Retrieving word for wordId: $wordId" }
+        return wordIDToWord[wordId]
+    }
+
     // Store page keywords
-    fun storePageKeywords(pageId: String, keywords: List<String>) {
+    fun storePageKeywords(pageId: String, keywords: List<Keyword>) {
         logger.debug { "[CrawlerDAO:storePageKeywords] Storing ${keywords.size} keywords for page ID: $pageId" }
         forwardIndex[pageId] = keywords
     }

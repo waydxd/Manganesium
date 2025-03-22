@@ -60,6 +60,13 @@ open class DatabaseManager(private val db: DB) {
         .valueSerializer(Serializer.STRING)
         .createOrOpen()
 
+    // WordID to Word mapping
+    protected val wordIDToWord: HTreeMap<String, String> = db
+        .hashMap("word_id_to_word")
+        .keySerializer(Serializer.STRING)
+        .valueSerializer(Serializer.STRING)
+        .createOrOpen()
+
     // Commit changes and close the database
     fun close() {
         db.commit()

@@ -38,7 +38,6 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
         return newPageId
     }
 
-
     // Retrieve page ID for a URL
     fun getPageIdForUrl(url: String): String? {
         val pageId = urlToPageId[url]
@@ -66,7 +65,7 @@ class CrawlerDAO(db: DB) : DatabaseManager(db) {
             "title" to page.title.toString(),
             "lastModified" to page.lastModified,
             "size" to page.size,
-            "links" to page.links
+            "url" to page.url
         )
         pageProperties[pageId] = properties
     }

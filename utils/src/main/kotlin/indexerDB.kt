@@ -12,7 +12,7 @@ fun main() {
     val invertedBodyMap = db.treeMap("inverted_body", Serializer.STRING, Serializer.JAVA).createOrOpen()
     val wordToWordIDMap = db.hashMap("word_to_word_id", Serializer.STRING, Serializer.STRING).createOrOpen()
     val forwardIndex = db.hashMap("forward_index", Serializer.STRING, Serializer.JAVA).createOrOpen()
-//    val stopWordsMap = db.hashSet("stop_words", Serializer.STRING).createOrOpen()
+    val wordIDToWordMap = db.hashMap("word_id_to_word", Serializer.STRING, Serializer.STRING).createOrOpen()
 
     // Print the contents of the invertedTitle map
     var count = 0
@@ -45,13 +45,22 @@ fun main() {
     }
     count = 0
 
-    // Print the contents of the stopWords map
+    // Print the contents of the wordToWordID map
+    logger.info { "\nContents of wordIDToWord map:" }
+    for ((key, value) in wordIDToWordMap) {
+        if (count++ > 10) {
+            break
+        }
+        logger.info { "Word ID: $key -> Word: $value" }
+    }
+    count = 0
+
     logger.info { "\nContents of forward index map:" }
     for ((key, value ) in forwardIndex) {
         if (count++ > 10) {
             break
         }
-        logger.info { "Page ID:$key -> keywords: $value" }
+        logger.info { "Page ID: $key -> keywords: $value" }
     }
 
     // Close the database

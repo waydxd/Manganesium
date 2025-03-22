@@ -1,6 +1,7 @@
 // Kotlin
 package dataAccessObject
 
+import models.Keyword
 import models.Post
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -68,7 +69,7 @@ class IndexerDAOTest {
  @Test
  fun testStorePageKeywords() {
   val pageId = "page1"
-  val keywords = listOf("keyword1", "keyword2")
+  val keywords = List(3) { Keyword("word$it", 1) }
   indexerDAO.storePageKeywords(pageId, keywords)
   val forwardIndex = db.hashMap("forward_index", Serializer.STRING, Serializer.JAVA).open()
   val storedKeywords = forwardIndex[pageId] as? List<String>
