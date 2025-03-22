@@ -7,10 +7,15 @@ import org.manganesium.crawler.Crawler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
 import org.manganesium.indexer.Indexer
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
 class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
+    // Thread pool for indexing tasks
+    private val executor: ExecutorService = Executors.newFixedThreadPool(5) // Adjust pool size as needed
 
     /**
      * Crawl a single page (fetch, parse, store in DB, enqueue child links).
@@ -52,14 +57,16 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         val page = storePageProperties(pageId, document, links, url)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page properties" }
 
-        // -------------------------------------------------------------
-        // Perform indexing in a new thread so the crawler does not wait.
-        // -------------------------------------------------------------
-        Thread {
+        // Submit indexing task to the thread pool
+        executor.submit {
             logger.debug { "[CrawlerService:crawlSinglePage - Thread] Indexing page content on a separate thread." }
-            indexer.indexPage(page)
-            logger.debug { "[CrawlerService:crawlSinglePage - Thread] Finished indexing page content." }
-        }.start()
+            try {
+                indexer.indexPage(page)
+                logger.debug { "[CrawlerService:crawlSinglePage - Thread] Finished indexing page content." }
+            } catch (e: Exception) {
+                logger.error { "[CrawlerService:crawlSinglePage - Thread] Failed to index page: $url, error: ${e.message}" }
+            }
+        }
 
         // Enqueue child links for further crawling
         logger.debug { "[CrawlerService:crawlSinglePage] Enqueuing child URLs for further crawling" }
@@ -102,5 +109,22 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         logger.debug { "[CrawlerService:storePageProperties] Stored Page object in DAO" }
 
         return page
+    }
+
+    /**
+     * Shutdown the executor and wait for all indexing tasks to complete.
+     */
+    fun shutdown() {
+        executor.shutdown() // Stop accepting new tasks
+        try {
+            // Wait up to 60 seconds for all tasks to finish
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                logger.warn { "Some indexing tasks did not finish within timeout" }
+                executor.shutdownNow() // Force shutdown if timeout occurs
+            }
+        } catch (e: InterruptedException) {
+            logger.error { "Shutdown interrupted: ${e.message}" }
+            executor.shutdownNow()
+        }
     }
 }

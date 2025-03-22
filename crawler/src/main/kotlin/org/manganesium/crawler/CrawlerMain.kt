@@ -29,10 +29,13 @@ fun main() {
     logger.info { "[Main:main] Starting the crawling process" }
     crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 30, indexer)
 
+    // Wait for all indexing tasks to complete
+    crawler.shutdown()
+
     // Close the DAO to commit and release resources
     crawler.close()
 
-    logger.info { "[Main:main] Crawling process completed" }
+    logger.info { "[Main:main] Crawling and indexing process completed" }
     logger.info { "[Main:main] Total pages visited: ${crawler.visitedUrls.size}" }
 
     println("Crawling summary:")

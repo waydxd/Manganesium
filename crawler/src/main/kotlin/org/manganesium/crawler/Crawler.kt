@@ -56,7 +56,7 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
 
     /**
      * Starts the crawling process from the given start URLs,
-     * with an optional maxDepth for BFS traversal.
+     * with an optional maxDepth for BFS traversal, stopping exactly at maxPages.
      *
      * @param startUrls URLs to begin crawling from
      * @param maxDepth Number of levels to traverse
@@ -74,11 +74,14 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
             logger.debug { "[Crawler:startCrawling] Processing depth level $currentDepth" }
 
             val levelSize = urlQueue.size
-            repeat(levelSize) {
-                // If we already hit maxPages, we can break out early
-                if (visitedUrls.size >= maxPages) return@repeat
+            for (i in 0 until levelSize) {
+                // Check if we've reached the page limit before processing the next URL
+                if (visitedUrls.size >= maxPages) {
+                    logger.debug { "[Crawler:startCrawling] Reached maxPages ($maxPages), stopping crawl" }
+                    break
+                }
 
-                val url = urlQueue.poll() ?: return@repeat
+                val url = urlQueue.poll() ?: continue
                 if (!visitedUrls.contains(url)) {
                     visitedUrls.add(url)
                     logger.debug { "[Crawler:startCrawling] Crawling URL: $url" }
@@ -86,9 +89,21 @@ class Crawler(private val crawlerDAO: CrawlerDAO) {
                 }
             }
             currentDepth++
+            // Check again after the level to break the outer loop if needed
+            if (visitedUrls.size >= maxPages) {
+                logger.debug { "[Crawler:startCrawling] Max pages reached at depth $currentDepth" }
+                break
+            }
         }
 
         logger.info { "[Crawler:startCrawling] Crawling process completed. Visited ${visitedUrls.size} URLs." }
+    }
+
+    /**
+     * Shutdown the crawler service (to wait for indexing threads)
+     */
+    fun shutdown() {
+        crawlerService.shutdown()
     }
 
     /**
