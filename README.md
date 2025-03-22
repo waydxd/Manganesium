@@ -12,19 +12,21 @@ This project is a comprehensive application developed as part of the COMP4321 co
 
 ## Technologies Used
 The project is built using the following technologies:
-- **Vue.js** (62.5%)
-- **Kotlin** (13.6%)
+- **Vue.js**
+- **Kotlin**
   - MapDB
   - Jsoup
   - Gradle
-- **CSS** (12.5%)
-- **TypeScript** (9.8%)
-- **HTML** (1.6%)
+  - JUnit
+  - slf4j
+  - Kotlin-Logging
+  - Logback
+  - mockito
 
 ## Installation
 To install and run this project locally, follow these steps:
 
-1. **Clone the repository**:
+1. **(Optional if you have the repo zip)Clone the repository**:
     ```bash
     git clone https://github.com/waydxd/COMP4321-Group25.git
     ```
@@ -35,34 +37,32 @@ To install and run this project locally, follow these steps:
     ```
 
 3. **Install dependencies**:
-    - For the Vue.js frontend:
+    - For the Vue.js frontend (Not implemented in phase 1):
       ```bash
-      cd frontend
+      cd web
       npm install
       ```
     - For the Kotlin backend:
       ```bash
-      cd backend
       ./gradlew build
       ```
+      or if you have gradle installed:
+      ```bash
+        gradle build
+        ```
 
 ## Usage
-To start the application, follow these steps:
+To run the project test program, follow these steps:
+```bash
+./gradlew run
+``` 
+or if you have gradle installed:
+```bash
+gradle run
+```
+then the `crawler.db`, `indexer.db` and `spider_test.txt` will be generated in the root directory.
 
-1. **Start the backend server**:
-    ```bash
-    cd backend
-    ./gradlew bootRun
-    ```
-
-2. **Start the frontend development server**:
-    ```bash
-    cd frontend
-    npm run serve
-    ```
-
-3. **Open your browser and navigate to** `http://localhost:8080`
-
+Alternatively, you can run the test program by running the `Main.kt` file in the `src/main/kotlin` directory using IntelliJ IDEA.
 ## Contributing
 Contributions are welcome! Please follow these steps to contribute:
 
