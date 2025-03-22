@@ -5,3 +5,16 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.13/samples
  * This project uses @Incubating APIs which are subject to change.
  */
+plugins {
+    id("org.jetbrains.dokka") version "2.0.0"
+}
+allprojects {
+    group = "org.manganesium"
+    version = "0.1.0"
+    repositories {
+        mavenCentral()
+    }
+}
+subprojects {
+    apply(plugin = "org.jetbrains.dokka")
+}
