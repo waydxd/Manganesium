@@ -18,15 +18,15 @@ The project is built using the following technologies:
   - Jsoup
   - Gradle
   - JUnit
-  - slf4j
+  - SLF4J
   - Kotlin-Logging
   - Logback
-  - mockito
+  - Mockito
 
 ## Installation
 To install and run this project locally, follow these steps:
 
-1. **(Optional if you have the repo zip)Clone the repository**:
+1. **(Optional if you have the repo zip) Clone the repository**:
     ```bash
     git clone https://github.com/waydxd/COMP4321-Group25.git
     ```
@@ -48,8 +48,8 @@ To install and run this project locally, follow these steps:
       ```
       or if you have gradle installed:
       ```bash
-        gradle build
-        ```
+      gradle build
+      ```
 
 ## Usage
 To run the project test program, follow these steps:
@@ -62,7 +62,7 @@ gradle run
 ```
 then the `crawler.db`, `indexer.db` and `spider_test.txt` will be generated in the root directory.
 
-Alternatively, you can run the test program by running the `Main.kt` file in the `src/main/kotlin` directory using IntelliJ IDEA.
+Alternatively, you can run the test program by running the `Main.kt` file in the `app/src/main/kotlin` directory using IntelliJ IDEA.
 ## Contributing
 Contributions are welcome! Please follow these steps to contribute:
 
