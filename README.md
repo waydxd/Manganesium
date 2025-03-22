@@ -9,7 +9,34 @@ Design documents and other project-related files can be found in the [docs](docs
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-
+```
+Manganesium
+├── app
+│   ├── Purpose: Integrates and runs the full pipeline (crawler, indexer, and test program for Phase 1; search and web later)
+│   ├── Usage: Executes main workflow, generates spider_result.txt for Phase 1
+│   └── Dependencies: crawler, indexer, utils (later: search, web)
+├── crawler
+│   ├── Purpose: Crawls web pages and stores metadata/links in the database
+│   ├── Usage: Fetches 30 pages (Phase 1) or 300 pages (Final), populates db.pages, urlToPageId, parentToChildLinks, childToParentLinks
+│   └─── Dependencies: utils, indexer
+├── indexer
+│   ├── Purpose: Indexes pages from the database for search functionality
+│   ├── Usage: Builds inverted, forward indexes (bodyInvertedIndex, titleInvertedIndex) and documentFrequency from db.pages
+│   └── Dependencies: utils
+├── search
+│   ├── Purpose: Implements the search engine backend (not in Phase 1)
+│   ├── Usage: Queries inverted indexes for ranked results (Final Submission)
+│   └── Dependencies: utils (later: indexer for db access)
+├── utils
+│   ├── Purpose: Provides shared utilities for all modules
+│   ├── Usage: Reusable code for database access, and other common tasks
+│   └── Dependencies: None (standalone)
+└─── web
+    ├── Purpose: Front-end interface for search engine (not in Phase 1)
+    ├── Usage: Displays search results via a web UI (Final Submission)
+    ├── Dependencies: search, utils
+    └── Files: (TBD for Final Submission)
+```
 ## Technologies Used
 The project is built using the following technologies:
 - **Vue.js**
