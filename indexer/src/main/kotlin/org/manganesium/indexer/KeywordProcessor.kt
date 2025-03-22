@@ -1,6 +1,5 @@
 package org.manganesium.indexer
 
-import org.manganesium.indexer.Porter
 import java.io.File
 import java.util.*
 import java.util.logging.Logger;
@@ -15,15 +14,29 @@ class KeywordProcessor {
 
     private fun loadStopword() {
         try {
-            val file = File("./indexer/src/main/kotlin/org/manganesium/indexer/stopwords.txt")
-            val reader: Scanner = Scanner(file)
-            while (reader.hasNextLine()) {
-                val data: String = reader.nextLine()
-                stopwords.add(data)
+            // Use resource loading instead of hardcoded path
+            val inputStream = javaClass.getResourceAsStream("org/manganesium/indexer/stopwords.txt")
+                ?: KeywordProcessor::class.java.getResourceAsStream("/org/manganesium/indexer/stopwords.txt")
+
+            if (inputStream != null) {
+                inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach { stopwords.add(it.trim()) }
+                }
+                LOGGER.info("Loaded ${stopwords.size} stopwords")
+            } else {
+                // Fallback to file path
+                val file = File("indexer/src/main/kotlin/org/manganesium/indexer/stopwords.txt")
+                if (file.exists()) {
+                    file.bufferedReader().useLines { lines ->
+                        lines.forEach { stopwords.add(it.trim()) }
+                    }
+                    LOGGER.info("Loaded ${stopwords.size} stopwords from file")
+                } else {
+                    LOGGER.warning("Stopwords file not found")
+                }
             }
         } catch (e: Exception) {
-            println(e)
-            LOGGER.warning("[ ERROR while loading stopwords ] ")
+            LOGGER.warning("ERROR loading stopwords: ${e.message}")
         }
     }
 
@@ -36,21 +49,33 @@ class KeywordProcessor {
      * @param keywordBody String, represent the raw body test string
      */
     fun stopAndStem(keywordBody: String?): HashMap<String, Int> {
-        val stems = HashMap<String, Int>()  // freq map
-        val tokenizer = StringTokenizer(keywordBody)
-        var stem: String    // stemmed word
-
+        val stems = HashMap<String, Int>()
+        if (keywordBody == null) {
+            LOGGER.info("Keyword body is null, returning empty map.")
+            return stems
+        }
+        LOGGER.info("Processing keyword body: $keywordBody")
+        val tokenizer = StringTokenizer(keywordBody, " \t\n\r\u000c")
         while (tokenizer.hasMoreTokens()) {
-            val word = tokenizer.nextToken()
-            if (stopwords.contains(word)) { 
+            val rawToken = tokenizer.nextToken()
+            LOGGER.fine("Raw token: $rawToken")
+            val token = rawToken.replace(Regex("[^\\p{L}\\p{Nd}]"), "").lowercase(Locale.getDefault())
+            LOGGER.fine("Cleaned token: $token")
+            if (token.isEmpty()) {
+                LOGGER.fine("Token is empty after cleaning, skipping.")
                 continue
             }
-            stem = stemmer.stripAffixes(word)
+            if (stopwords.contains(token)) {
+                LOGGER.fine("Token '$token' is a stopword, skipping.")
+                continue
+            }
+            val stem = stemmer.stripAffixes(token)
+            LOGGER.fine("Token '$token' stemmed to '$stem'.")
             stems[stem] = stems.getOrDefault(stem, 0) + 1
         }
+        LOGGER.info("Total processed tokens after stopword removal and stemming: ${stems.values.sum()}")
         return stems
     }
-
     companion object {
         private var keywordProcessorInstance: KeywordProcessor? = null
         private val LOGGER: Logger = Logger.getLogger(KeywordProcessor::class.java.name)
