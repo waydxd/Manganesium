@@ -39,8 +39,8 @@ Manganesium
 ```
 ## Technologies Used
 The project is built using the following technologies:
-- **Vue.js frontend**
-- **Kotlin backend**
+- **Vue.js** (frontend)
+- **Kotlin** (backend)
   - MapDB
   - Jsoup
   - Gradle
