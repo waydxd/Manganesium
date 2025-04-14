@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection">
-      <change afterPath="$PROJECT_DIR$/utils/src/main/kotlin/phase1Test/test_program.kt" afterDir="false" />
+    <list default="true" id="06b3a6ec-6b89-4445-8632-57bc9a7da697" name="Changes" comment="Remove Dokka plugin configuration from build.gradle.kts">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/test_program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/test_program.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,17 +29,6 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="manganesium" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="manganesium" type="f1a62948:ProjectNode" />
-                <item name="crawler" type="2d1252cf:ModuleNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="manganesium" type="f1a62948:ProjectNode" />
-                <item name="crawler" type="2d1252cf:ModuleNode" />
-                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
               </path>
             </expand>
             <select />
@@ -93,6 +79,7 @@
     "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Gradle.Build COMP4321-Group25.executor": "Run",
+    "Gradle.COMP4321-Group25 [run].executor": "Profiler#1",
     "Gradle.CrawlerDAOTest (1).executor": "Run",
     "Gradle.CrawlerDAOTest.executor": "Run",
     "Gradle.IndexerDAOTest.executor": "Run",
@@ -100,7 +87,7 @@
     "Gradle.IndexerDAOTest.testGetWordIdForWord.executor": "Run",
     "Gradle.IndexerDAOTest.testStoreInvertedBody.executor": "Debug",
     "Gradle.IndexerDAOTest.testStoreInvertedTitle.executor": "Run",
-    "Kotlin.CrawlerMainKt.executor": "Run",
+    "Kotlin.CrawlerMainKt.executor": "Profiler#1",
     "Kotlin.DBKt.executor": "Run",
     "Kotlin.IndexerDBKt.executor": "Run",
     "Kotlin.MainKt.executor": "Run",
@@ -142,7 +129,29 @@
       <recent name="dataAccessObject" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.Test_programKt">
+  <component name="RunManager" selected="Kotlin.CrawlerMainKt">
+    <configuration name="COMP4321-Group25 [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="run" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration name="IndexerDAOTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -157,30 +166,6 @@
             <option value=":utils:test" />
             <option value="--tests" />
             <option value="&quot;dataAccessObject.IndexerDAOTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="IndexerDAOTest.testGetWordIdForWord" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":utils:test" />
-            <option value="--tests" />
-            <option value="&quot;dataAccessObject.IndexerDAOTest.testGetWordIdForWord&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -214,11 +199,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Kotlin.CrawlerMainKt" />
+        <item itemvalue="Gradle.COMP4321-Group25 [run]" />
         <item itemvalue="Kotlin.Test_programKt" />
         <item itemvalue="Kotlin.IndexerDBKt" />
-        <item itemvalue="Kotlin.CrawlerMainKt" />
         <item itemvalue="Gradle.IndexerDAOTest" />
-        <item itemvalue="Gradle.IndexerDAOTest.testGetWordIdForWord" />
       </list>
     </recent_temporary>
   </component>
@@ -374,7 +359,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742578633043</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="deleted unused files">
+      <option name="closed" value="true" />
+      <created>1742741120732</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1742741120732</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Remove Dokka plugin configuration from build.gradle.kts">
+      <option name="closed" value="true" />
+      <created>1742741931476</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1742741931476</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -410,7 +411,9 @@
     <MESSAGE value="Add CrawlerDAO tests and update Page and Post data classes for improved functionality" />
     <MESSAGE value="Refactor Indexer and IndexerDAO to use updated package structure and improve logging in data handling methods" />
     <MESSAGE value="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove debug validation calls in IndexerDAO and add indexerDB for database inspection" />
+    <MESSAGE value="deleted unused files" />
+    <MESSAGE value="Remove Dokka plugin configuration from build.gradle.kts" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove Dokka plugin configuration from build.gradle.kts" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
