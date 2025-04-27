@@ -5,12 +5,7 @@ import org.mapdb.DB
 import org.mapdb.HTreeMap
 import org.mapdb.Serializer
 
-/**
- * Base class for managing database operations using MapDB.
- *
- * @property db the MapDB instance used for database operations.
- */
-open class DatabaseManager(private val db: DB) {
+open class IndexerDatabaseManager(val db: DB) {
     /**
      * Forward Index: pageId -> metadata (HTreeMap for fast random access).
      */
@@ -35,40 +30,6 @@ open class DatabaseManager(private val db: DB) {
         .valueSerializer(Serializer.JAVA)
         .createOrOpen()
 
-    /**
-     * URL to Page ID Mapping: url -> pageId (HTreeMap for fast lookups).
-     */
-    val urlToPageId: HTreeMap<String, String> = db
-        .hashMap("url_to_page_id")
-        .keySerializer(Serializer.STRING)
-        .valueSerializer(Serializer.STRING)
-        .createOrOpen()
-
-    /**
-     * Parent/Child Links: parentPageId -> list of childPageIds (BTreeMap for ordered traversal).
-     */
-    val parentChildLinks: BTreeMap<String, Any> = db
-        .treeMap("parent_child_links")
-        .keySerializer(Serializer.STRING)
-        .valueSerializer(Serializer.JAVA)
-        .createOrOpen()
-
-    /**
-     * Set of stop words.
-     */
-    val stopWords = db
-        .hashSet("stop_words")
-        .serializer(Serializer.STRING)
-        .createOrOpen()
-
-    /**
-     * Page properties.
-     */
-    val pageProperties: HTreeMap<String, Any> = db
-        .hashMap("page_properties")
-        .keySerializer(Serializer.STRING)
-        .valueSerializer(Serializer.JAVA)
-        .createOrOpen()
 
     /**
      * Word to WordID mapping.
@@ -86,6 +47,11 @@ open class DatabaseManager(private val db: DB) {
         .hashMap("word_id_to_word")
         .keySerializer(Serializer.STRING)
         .valueSerializer(Serializer.STRING)
+        .createOrOpen()
+
+    val stopWords = db
+        .hashSet("stop_words")
+        .serializer(Serializer.STRING)
         .createOrOpen()
 
     /**

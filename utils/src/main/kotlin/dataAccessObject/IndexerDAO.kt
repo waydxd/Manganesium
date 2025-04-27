@@ -11,12 +11,12 @@ import java.util.UUID
 /**
  * Data Access Object (DAO) for managing indexer database operations.
  *
- * This class extends [DatabaseManager] and provides functions to store and retrieve
+ * This class extends [IndexerDatabaseManager] and provides functions to store and retrieve
  * inverted indexes, stop words, word mappings, and page keywords.
  *
  * @param db the MapDB instance used for database operations.
  */
-class IndexerDAO(db: DB) : DatabaseManager(db) {
+class IndexerDAO(db: DB) : IndexerDatabaseManager(db) {
     private val logger = KotlinLogging.logger {}
 
     /**
