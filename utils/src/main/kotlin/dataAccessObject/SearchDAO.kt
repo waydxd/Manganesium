@@ -1,0 +1,4 @@
+package dataAccessObject
+
+class SearchDAO {
+}
