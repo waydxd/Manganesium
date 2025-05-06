@@ -40,5 +40,5 @@ tasks.named<JavaExec>("run") {
 }
 application {
     // Fully qualified name of the class containing the main function
-    mainClass.set("app.testMainKt")
+    mainClass.set("app.TestMainKt")
 }

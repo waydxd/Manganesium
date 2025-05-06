@@ -12,7 +12,7 @@ import java.io.File
  * @constructor Creates a CrawlerDAO from the provided database.
  * @param db the MapDB instance used for database operations.
  */
-class CrawlerDAO(db: DB) : DatabaseManager(db) {
+class CrawlerDAO(db: DB) : CrawlerDatabaseManager(db) {
     private val logger = KotlinLogging.logger {}
 
     /**
