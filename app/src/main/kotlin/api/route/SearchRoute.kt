@@ -8,25 +8,34 @@ import io.ktor.server.routing.*
 import io.ktor.http.*
 import mu.KotlinLogging
 
-fun Application.configureSearchRoute() {
-//    val logger = KotlinLogging.logger {}
-//    val appService = AppService()
-//
-//    routing {
-//        get("/search") {
-//            try {
-//                val request = SearchRequest(
-//                    query = call.parameters["query"]?.trim() ?: return@get call.respond(HttpStatusCode.BadRequest),
-//                    limit = call.parameters["limit"]?.toIntOrNull() ?: 10,
-//                    offset = call.parameters["offset"]?.toIntOrNull() ?: 0
-//                )
-//                logger.debug { "Processing search: $request" }
-//                val results = appService.search(request)
-//                call.respond(results)
-//            } catch (e: IllegalArgumentException) {
-//                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-//            }
-//        }
-//    }
+fun Application.configureRouting() {
+    val logger = KotlinLogging.logger {}
+    routing {
+        route("/api") {
+            get("/search") {
+                try {
+                    val query = call.request.queryParameters["query"] ?: ""
+                    val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 1
+                    val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 10
 
+                    logger.info { "Received search request: $query" }
+
+                    val request = SearchRequest(query, limit, offset)
+                    val app = AppService()
+                    val results = app.search(request)
+                    call.respond(HttpStatusCode.OK, results)
+                } catch (e: Exception) {
+                    logger.error(e) { "Error processing search request" }
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to (e.message ?: "Unknown error"))
+                    )
+                }
+            }
+
+            get("/health") {
+                call.respond(HttpStatusCode.OK, mapOf("status" to "UP"))
+            }
+        }
+    }
 }
