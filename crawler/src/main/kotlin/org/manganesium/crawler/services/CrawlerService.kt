@@ -5,8 +5,14 @@ import models.Page
 import org.jsoup.nodes.Document
 import org.manganesium.crawler.Crawler
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jsoup.Jsoup
 import java.time.Instant
 import org.manganesium.indexer.Indexer
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -53,6 +59,8 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
             logger.error { "[CrawlerService:crawlSinglePage] Failed to fetch document from URL: $url" }
             return
         }
+        val response = Jsoup.connect(url).execute()
+        val lastModifiedHeader = response.header("Last-Modified")
 
         // Store URL -> pageID
         logger.debug { "[CrawlerService:crawlSinglePage] Storing URL to page ID mapping for URL: $url" }
@@ -78,7 +86,7 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
 
         // Build and store the Page model
         logger.debug { "[CrawlerService:crawlSinglePage] Storing page properties" }
-        val page = storePageProperties(pageId, document, links, url)
+        val page = storePageProperties(pageId, document, links, url, lastModifiedHeader)
         logger.debug { "[CrawlerService:crawlSinglePage] Stored page properties" }
 
         // Submit indexing task to the thread pool
@@ -119,13 +127,32 @@ class CrawlerService(val crawlerDAO: CrawlerDAO, val crawler: Crawler) {
         pageId: String,
         doc: Document,
         links: List<String>,
-        url: String
+        url: String,
+        lastModifiedHeader: String?
     ): Page {
         logger.debug { "[CrawlerService:storePageProperties] Creating Page object for URL: $url" }
         val title = doc.title().takeIf { it.isNotBlank() } ?: ""
         val content = doc.body()?.text() ?: ""
-        val lastModified = Instant.now().toString()
         val size = doc.outerHtml().length
+
+        val outputFormatter = DateTimeFormatter
+            .ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+            .withZone(ZoneId.of("Asia/Hong_Kong"))
+        val lastModified = try {
+            if (lastModifiedHeader.isNullOrBlank()) {
+                logger.debug { "[CrawlerService:storePageProperties] No Last-Modified header for URL: $url, using current time in HKT" }
+                ZonedDateTime.now(ZoneId.of("Asia/Hong_Kong")).format(outputFormatter)
+            } else {
+                val inputFormatter = DateTimeFormatter
+                    .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
+                    .withZone(ZoneId.of("GMT"))
+                val date = ZonedDateTime.parse(lastModifiedHeader, inputFormatter)
+                date.withZoneSameInstant(ZoneId.of("Asia/Hong_Kong")).format(outputFormatter)
+            }
+        } catch (e: DateTimeParseException) {
+            logger.warn { "[CrawlerService:storePageProperties] Invalid Last-Modified header '$lastModifiedHeader' for URL: $url, using current time in HKT" }
+            ZonedDateTime.now(ZoneId.of("Asia/Hong_Kong")).format(outputFormatter)
+        }
 
         val page = Page(
             id = pageId,
