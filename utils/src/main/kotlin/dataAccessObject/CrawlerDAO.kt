@@ -96,8 +96,21 @@ class CrawlerDAO(db: DB) : CrawlerDatabaseManager(db) {
             "title" to page.title.toString(),
             "lastModified" to page.lastModified,
             "size" to page.size,
-            "url" to page.url
+            "url" to page.url,
+            "content" to page.content,
         )
         pageProperties[pageId] = properties
     }
+
+    /**
+     * Retrieves properties of a page by its unique identifier.
+     *
+     * @param pageId the unique page identifier.
+     * @return a map of page properties if found, otherwise null.
+     */
+    fun getPageProperties(pageId: String): Map<String, Any>? {
+        val properties = pageProperties[pageId] as? Map<String, Any>
+        logger.debug { "[CrawlerDAO:getPageProperties] Retrieved properties for page ID: $pageId" }
+        return properties
+        }
 }
