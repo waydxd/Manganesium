@@ -16,6 +16,14 @@ class AppService {
     private val indexerDAO = IndexerDAO("indexer.db")
     private val searchService = SearchService(crawlerDAO, indexerDAO);
 
+    init {
+        // Register shutdown hook to close resources when JVM exits
+        Runtime.getRuntime().addShutdownHook(Thread {
+            logger.info { "JVM shutdown detected, closing database resources" }
+            shutdown()
+        })
+    }
+
      fun search(request: SearchRequest): List<SearchResponse> {
         logger.debug { "Searching for: ${request.query}" }
 
@@ -80,6 +88,12 @@ class AppService {
         } catch (e: Exception) {
             "Unknown date"
         }
+    }
+
+    private fun shutdown() {
+        logger.info { "Shutting down AppService" }
+        crawlerDAO.close()
+        indexerDAO.close()
     }
 
 }

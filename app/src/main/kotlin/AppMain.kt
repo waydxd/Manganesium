@@ -1,5 +1,6 @@
 package app
 
+import api.route.ServiceHolder
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -32,6 +33,29 @@ class ApiServer {
 
 fun main() {
     val logger = KotlinLogging.logger {}
+
+    try {
+        logger.info { "Starting Crawler in background thread..." }
+        // Create and start a thread for running the crawler
+        val crawlerThread = Thread {
+            try {
+                org.manganesium.crawler.main()
+                logger.info { "Crawler completed." }
+                // Mark crawler as complete to initialize the AppService
+                ServiceHolder.markCrawlingComplete()
+            } catch (e: Exception) {
+                logger.error(e) { "Error running crawler" }
+            }
+        }
+
+        // Set as daemon thread so it won't prevent application shutdown
+        crawlerThread.isDaemon = true
+        crawlerThread.start()
+
+    } catch (e: Exception) {
+        logger.error(e) { "Error setting up crawler thread" }
+    }
+
     logger.info { "Starting API server..." }
 
     try {
@@ -40,4 +64,6 @@ fun main() {
     } catch (e: Exception) {
         logger.error(e) { "Error starting API server" }
     }
+
+
 }

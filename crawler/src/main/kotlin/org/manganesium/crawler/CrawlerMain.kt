@@ -51,7 +51,7 @@ fun main() {
     //  - maxDepth = 3 (or any depth you need)
     //  - maxPages = 30 so it stops exactly after 30 pages
     logger.info { "[Main:main] Starting the crawling process" }
-    crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 30, indexer)
+    crawler.startCrawling(startUrls, maxDepth = 3, maxPages = 300, indexer)
 
     // Wait for all indexing tasks to complete
     crawler.shutdown()
