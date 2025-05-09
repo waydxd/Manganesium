@@ -8,8 +8,8 @@
       </p>
       <div class="results">
         <div v-for="result in results" :key="result.url" class="result">
-          <p class="score">{{ result.score || 'N/A' }}</p>
-          <p><strong>Page Title:</strong> {{ result.pageTitle || 'Untitled' }}</p>
+          <p class="score"><strong>Score - </strong><span class="score-value">{{ result.score || 'N/A' }}</span></p>
+          <p><strong>Page Title - </strong> {{ result.pageTitle || 'Untitled' }}</p>
           <a
             :href="result.url || '#'"
             target="_blank"
@@ -17,10 +17,10 @@
             class="result-url"
           >{{ result.url || 'No URL available' }}</a>
           <p v-if="result.lastModified && isValidDate(result.lastModified)">
-            <strong>Last Modification Date:</strong> {{ formatDate(result.lastModified) }}
+            <strong>Last Modification Date - </strong> {{ formatDate(result.lastModified) }}
           </p>
-          <p v-else><strong>Last Modification Date:</strong> N/A</p>
-          <p><strong>Size of Page:</strong> {{ result.pageSize ? result.pageSize + ' bytes' : 'N/A' }}</p>
+          <p v-else><strong>Last Modification Date - </strong> N/A</p>
+          <p><strong>Size of Page - </strong> {{ result.pageSize ? result.pageSize + ' bytes' : 'N/A' }}</p>
           <div v-if="result.keywords && result.keywords.length > 0" class="keywords">
             <p v-for="kw in result.keywords" :key="kw.keyword">
               {{ kw.keyword }} {{ kw.frequency }}
@@ -110,10 +110,18 @@ const isValidDate = (dateStr: string) => {
 
 const formatDate = (dateStr: string) => {
   try {
+    // Check if the date string matches the expected format
+    const dateRegex = /^[A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2} HKT \d{4}$/;
+    if (dateRegex.test(dateStr)) {
+      // Return the raw string if it matches the backend format
+      console.log('Using raw date string:', { dateStr });
+      return dateStr;
+    }
+
     // Try date-fns parsing without timezone
     const parsed = parse(dateStr, 'EEE MMM dd HH:mm:ss yyyy', new Date());
     if (isValid(parsed)) {
-      const formatted = format(parsed, 'MMMM d, yyyy');
+      const formatted = format(parsed, "EEE MMM dd yyyy HH:mm:ss 'HKT'");
       console.log('Formatted date with date-fns:', { dateStr, parsed, formatted });
       return formatted;
     }
@@ -122,7 +130,7 @@ const formatDate = (dateStr: string) => {
     const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
     const fallback = new Date(fallbackStr);
     if (!isNaN(fallback.getTime())) {
-      const formatted = format(fallback, 'MMMM d, yyyy');
+      const formatted = format(fallback, "EEE MMM dd yyyy HH:mm:ss 'HKT'");
       console.log('Fallback formatted date:', { dateStr, fallbackStr, parsed: fallback, formatted });
       return formatted;
     }
@@ -135,7 +143,16 @@ const formatDate = (dateStr: string) => {
     const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
     const fallback = new Date(fallbackStr);
     if (!isNaN(fallback.getTime())) {
-      const formatted = fallback.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const formatted = fallback.toLocaleString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).replace(/(\d{2}:\d{2}:\d{2})/, '$1 HKT').replace(/,/, '');
       console.log('Fallback formatted date:', { dateStr, fallbackStr, parsed: fallback, formatted });
       return formatted;
     }
@@ -262,13 +279,16 @@ h1 {
   top: 0.5rem;
   right: 0.5rem;
   color: var(--color-primary); /* Purple, ~#9966CC */
-  background: var(--color-secondary); /* Secondary color */
-  padding: 0.2rem 0.6rem 0.2rem 0.4rem; /* Extra right padding for spacing */
-  border-radius: 0.3rem;
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   margin: 0;
+}
+
+.score-value {
+  background: var(--color-secondary); /* Secondary color */
+  padding: 0.2rem 0.6rem 0.2rem 0.4rem; /* Extra right padding for spacing */
+  border-radius: 0.3rem;
 }
 
 .result p {
@@ -283,13 +303,13 @@ h1 {
   text-decoration: none;
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
-  display: block;
-  margin: 0.5rem 0;
+  display: inline-block; /* Highlight text length with block behavior */
+  padding: 0 1.2rem; /* Padding for highlight */
 }
 
 .result-url:hover {
   text-decoration: underline;
-  background: var(--color-secondary);
+  background: var(--color-secondary); /* Secondary color */
 }
 
 .snippet {
