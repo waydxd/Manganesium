@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header>
-      <div class="left">
+      <RouterLink v-if="$route.path !== '/'" to="/" class="left">
         <img
           alt="Manganesium logo"
           class="logo"
@@ -10,7 +10,7 @@
           height="60"
         />
         <h1>Manganesium</h1>
-      </div>
+      </RouterLink>
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
@@ -67,9 +67,8 @@ header {
   background: var(--color-background);
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 2vw;
-  box-shadow: 0 0.5rem 1rem var(--shadow-dark);
+  box-shadow: 0 0 0.8rem var(--shadow-dark);
   z-index: 1000;
 }
 
@@ -78,6 +77,7 @@ header {
   align-items: center;
   gap: 1vw;
   margin-left: 2vw;
+  text-decoration: none;
 }
 
 .logo {
@@ -95,9 +95,10 @@ h1 {
 }
 
 nav {
+  position: absolute;
+  right: 2vw;
   display: flex;
   gap: 1vw;
-  margin-right: 2vw;
 }
 
 nav a {
@@ -127,7 +128,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 6rem;
+  padding-top: 4rem;
   padding-bottom: 3rem;
 }
 
@@ -155,7 +156,6 @@ main {
   }
 
   .left {
-    margin-left: 3vw;
     gap: 1.5vw;
   }
 
@@ -169,8 +169,8 @@ main {
   }
 
   nav {
+    right: 3vw;
     gap: 1.5vw;
-    margin-right: 3vw;
   }
 
   nav a {
@@ -179,7 +179,6 @@ main {
   }
 
   main {
-    padding-top: 7rem;
     padding-bottom: 3.5rem;
   }
 

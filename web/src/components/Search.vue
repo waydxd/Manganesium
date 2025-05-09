@@ -1,253 +1,197 @@
 <template>
-  <div class="search-container">
-    <form @submit.prevent="handleSearch" aria-label="Search form">
-      <input
-        v-model="query"
-        type="text"
-        placeholder="Enter your search query..."
-        :disabled="loading"
-        aria-label="Search query"
-        class="search-input"
-      />
-      <button
-        type="submit"
-        :disabled="loading"
-        class="search-button"
-        aria-label="Submit search"
-      >
-        {{ loading ? 'Searching...' : 'Search' }}
-      </button>
-    </form>
-    <p v-if="error" class="error">{{ error }}</p>
-    <p v-if="results.length === 0 && !loading && !error" class="no-results">
-      No results found. Try a different query.
-    </p>
-    <div class="results">
-      <div v-for="result in results" :key="result.pageID" class="result">
-        <h3 class="result-title">{{ result.title }}</h3>
-        <div class="snippet" v-html="result.snippet"></div>
-        <a
-          :href="result.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="result-url"
-        >{{ result.url }}</a
-        >
-        <p class="last-modified">Last Modified: {{ result.lastModified }}</p>
+  <div id="app">
+    <header>
+      <div class="left" v-if="$route.path !== '/'">
+        <img
+          alt="Manganesium logo"
+          class="logo"
+          src="@/assets/logo.png"
+          width="60"
+          height="60"
+        />
+        <h1>Manganesium</h1>
       </div>
-    </div>
-    <div v-if="results.length > 0" class="pagination">
-      <button
-        @click="handlePrevious"
-        :disabled="offset === 0"
-        class="pagination-button"
-      >
-        Previous
-      </button>
-      <button
-        @click="handleNext"
-        :disabled="results.length < limit"
-        class="pagination-button"
-      >
-        Next
-      </button>
-    </div>
+      <div class="placeholder" v-else></div>
+      <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+      </nav>
+    </header>
+    <main>
+      <RouterView />
+    </main>
+    <footer v-if="isLoading || !isReady" class="status">
+      <p v-if="isLoading">Loading...</p>
+      <p v-else>Search service is initializing. You can try searching, but results may be incomplete.</p>
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { search } from '../api/search';
-import { SearchResponse, SearchRequest } from '../api/types';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { RouterLink, RouterView } from 'vue-router';
+import { checkHealth, isSearchReady } from '@/api/search.ts';
 
-const query = ref('');
-const results = ref<SearchResponse[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const offset = ref(0);
-const limit = 10;
+const isReady = ref(false);
+const isLoading = ref(true);
 
-const handleSearch = async () => {
-  if (!query.value.trim()) {
-    error.value = 'Please enter a search query';
-    return;
-  }
-  loading.value = true;
-  error.value = null;
+const check = async () => {
   try {
-    const request: SearchRequest = {
-      query: query.value,
-      limit,
-      offset: offset.value,
-    };
-    const data = await search(request);
-    results.value = data;
-  } catch (err: any) {
-    error.value = err.message || 'Failed to fetch search results';
+    isReady.value = await isSearchReady();
+  } catch {
+    isReady.value = false;
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
 
-const handleNext = () => {
-  offset.value += limit;
-  handleSearch();
-};
-
-const handlePrevious = () => {
-  if (offset.value >= limit) {
-    offset.value -= limit;
-    handleSearch();
-  }
-};
+onMounted(() => {
+  check();
+  const interval = setInterval(check, 5000);
+  onUnmounted(() => clearInterval(interval));
+});
 </script>
 
 <style scoped>
-.search-container {
-  background: var(--color-background);
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
-}
-
-form {
+#app {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.search-input {
-  flex-grow: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 5rem;
   background: var(--color-background);
-  box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2vw;
+  box-shadow: 0 0 0.8rem var(--shadow-dark);
+  z-index: 1000;
 }
 
-.search-input:focus {
-  outline: none;
-  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  margin-left: 2vw;
 }
 
-.search-button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(145deg, #a279d1, #8855b6);
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
-  transition: all 0.3s ease;
+.placeholder {
+  flex: 1; /* Ensures nav stays right */
 }
 
-.search-button:hover:not(:disabled) {
-  background: linear-gradient(145deg, #8855b6, #a279d1);
-  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+.logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  box-shadow: 0.25rem 0.25rem 0.5rem var(--shadow-dark), -0.25rem -0.25rem 0.5rem var(--shadow-light);
 }
 
-.search-button:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
-}
-
-.error {
-  color: var(--color-error);
-  font-family: 'Poppins', sans-serif;
-  margin-bottom: 20px;
-}
-
-.no-results {
-  color: var(--color-text-muted);
-  font-family: 'Poppins', sans-serif;
-  margin-bottom: 20px;
-}
-
-.results {
-  margin-top: 20px;
-}
-
-.result {
-  background: var(--color-background);
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
-}
-
-.result-title {
-  margin: 0 0 8px;
+h1 {
   color: var(--color-primary);
-  font-family: 'Poppins', sans-serif;
-  font-size: 18px;
+  font-size: 1.5rem;
   font-weight: 600;
+  margin: 0;
 }
 
-.snippet {
-  margin: 8px 0;
-  color: var(--color-text);
-  font-family: 'Poppins', sans-serif;
+nav {
+  display: flex;
+  gap: 1vw;
+  margin-right: 2vw;
 }
 
-.snippet :deep(b) {
-  background: var(--color-secondary);
-  font-weight: 500;
-}
-
-.result-url {
+nav a {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  background: var(--color-background);
   color: var(--color-primary);
   text-decoration: none;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  display: block;
-  margin: 8px 0;
-}
-
-.result-url:hover {
-  text-decoration: underline;
-  background: var(--color-secondary);
-}
-
-.last-modified {
-  color: var(--color-text-muted);
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  margin: 8px 0 0;
-}
-
-.pagination {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.pagination-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(145deg, #a279d1, #8855b6);
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0.25rem 0.25rem 0.5rem var(--shadow-dark), -0.25rem -0.25rem 0.5rem var(--shadow-light);
   transition: all 0.3s ease;
 }
 
-.pagination-button:hover:not(:disabled) {
-  background: linear-gradient(145deg, #8855b6, #a279d1);
-  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+nav a:hover {
+  background: var(--color-secondary);
+  box-shadow: 0.15rem 0.15rem 0.3rem var(--shadow-dark), -0.15rem -0.15rem 0.3rem var(--shadow-light);
 }
 
-.pagination-button:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
+nav a.router-link-exact-active {
+  background: linear-gradient(145deg, #a279d1, #8855b6);
+  color: #fff;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+
+.status {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: var(--color-background);
+  padding: 0.5rem;
+  text-align: center;
+  box-shadow: 0 -0.3rem 0.6rem var(--shadow-dark);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.status p {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  header {
+    padding: 0 3vw;
+  }
+
+  .left {
+    gap: 1.5vw;
+  }
+
+  .logo {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 1.5vw;
+  }
+
+  nav a {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  main {
+    padding-top: 7rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .status {
+    padding: 0.6rem;
+  }
+
+  .status p {
+    font-size: 0.9rem;
+  }
 }
 </style>

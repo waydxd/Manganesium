@@ -35,7 +35,7 @@ h1 {
   font-family: 'Poppins', sans-serif;
   font-size: 2rem;
   font-weight: 600;
-  margin-bottom: var(--spacing-unit);
+  margin-bottom: 3vh;
 }
 
 .content {

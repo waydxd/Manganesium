@@ -7,16 +7,40 @@
         No results found. Try a different query.
       </p>
       <div class="results">
-        <div v-for="result in results" :key="result.pageID" class="result">
-          <h3 class="result-title">{{ result.title }}</h3>
-          <div class="snippet" v-html="result.snippet"></div>
+        <div v-for="result in results" :key="result.url" class="result">
+          <p class="score">{{ result.score || 'N/A' }}</p>
+          <p><strong>Page Title:</strong> {{ result.pageTitle || 'Untitled' }}</p>
           <a
-            :href="result.url"
+            :href="result.url || '#'"
             target="_blank"
             rel="noopener noreferrer"
             class="result-url"
-          >{{ result.url }}</a>
-          <p class="last-modified">Last Modified: {{ result.lastModified }}</p>
+          >{{ result.url || 'No URL available' }}</a>
+          <p v-if="result.lastModified && isValidDate(result.lastModified)">
+            <strong>Last Modification Date:</strong> {{ formatDate(result.lastModified) }}
+          </p>
+          <p v-else><strong>Last Modification Date:</strong> N/A</p>
+          <p><strong>Size of Page:</strong> {{ result.pageSize ? result.pageSize + ' bytes' : 'N/A' }}</p>
+          <div v-if="result.keywords && result.keywords.length > 0" class="keywords">
+            <p v-for="kw in result.keywords" :key="kw.keyword">
+              {{ kw.keyword }} {{ kw.frequency }}
+            </p>
+          </div>
+          <div v-else><p>No keywords available</p></div>
+          <div v-if="result.parentLinks && result.parentLinks.length > 0" class="parent-links">
+            <p v-for="link in result.parentLinks" :key="link">
+              <a :href="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+            </p>
+          </div>
+          <div v-else><p>No parent links available</p></div>
+          <div v-if="result.childLinks && result.childLinks.length > 0" class="child-links">
+            <p v-for="link in result.childLinks" :key="link">
+              <a :href="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+            </p>
+          </div>
+          <div v-else><p>No child links available</p></div>
+          <div v-if="result.snippet" class="snippet" v-html="result.snippet"></div>
+          <div v-else><p>No snippet available</p></div>
         </div>
       </div>
       <div v-if="results.length > 0" class="pagination">
@@ -42,8 +66,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { parse, isValid, format } from 'date-fns';
 import { search } from '../api/search';
-import { SearchResponse, SearchRequest } from '../api/types';
+import type { SearchRequest, SearchResponse } from '../api/types';
 
 defineProps<{
   query: string;
@@ -57,6 +82,66 @@ const limit = 10;
 
 const router = useRouter();
 const route = useRoute();
+
+const isValidDate = (dateStr: string) => {
+  try {
+    // Try date-fns parsing without timezone
+    const parsed = parse(dateStr, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+    const isValidDate = isValid(parsed);
+    console.log('Validating date with date-fns:', { dateStr, parsed, isValid: isValidDate });
+    if (isValidDate) return true;
+
+    // Fallback: Replace HKT with GMT+0800
+    const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
+    const fallback = new Date(fallbackStr);
+    const isValidFallback = !isNaN(fallback.getTime());
+    console.log('Fallback date parsing:', { dateStr, fallbackStr, parsed: fallback, isValid: isValidFallback });
+    return isValidFallback;
+  } catch (error) {
+    console.error('Date parsing error:', error, { dateStr });
+    // Fallback: Replace HKT with GMT+0800
+    const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
+    const fallback = new Date(fallbackStr);
+    const isValidFallback = !isNaN(fallback.getTime());
+    console.log('Fallback date parsing:', { dateStr, fallbackStr, parsed: fallback, isValid: isValidFallback });
+    return isValidFallback;
+  }
+};
+
+const formatDate = (dateStr: string) => {
+  try {
+    // Try date-fns parsing without timezone
+    const parsed = parse(dateStr, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+    if (isValid(parsed)) {
+      const formatted = format(parsed, 'MMMM d, yyyy');
+      console.log('Formatted date with date-fns:', { dateStr, parsed, formatted });
+      return formatted;
+    }
+
+    // Fallback: Replace HKT with GMT+0800
+    const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
+    const fallback = new Date(fallbackStr);
+    if (!isNaN(fallback.getTime())) {
+      const formatted = format(fallback, 'MMMM d, yyyy');
+      console.log('Fallback formatted date:', { dateStr, fallbackStr, parsed: fallback, formatted });
+      return formatted;
+    }
+
+    console.warn('Invalid date format:', { dateStr, parsed });
+    return 'N/A';
+  } catch (error) {
+    console.error('Date formatting error:', error, { dateStr });
+    // Fallback: Replace HKT with GMT+0800
+    const fallbackStr = dateStr.replace('HKT', 'GMT+0800');
+    const fallback = new Date(fallbackStr);
+    if (!isNaN(fallback.getTime())) {
+      const formatted = fallback.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      console.log('Fallback formatted date:', { dateStr, fallbackStr, parsed: fallback, formatted });
+      return formatted;
+    }
+    return 'N/A';
+  }
+};
 
 const fetchResults = async (query: string, offset: number) => {
   if (!query.trim()) {
@@ -73,21 +158,31 @@ const fetchResults = async (query: string, offset: number) => {
       offset,
     };
     const data = await search(request);
+    console.log('Processed search results:', data);
+    if (data.length === 0) {
+      error.value = 'No results returned. The search service may be initializing or the query yielded no matches.';
+    }
     results.value = data;
   } catch (err: any) {
+    console.error('Search error:', err);
     error.value = err.message || 'Failed to fetch search results';
+    results.value = [];
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(() => {
-  fetchResults(route.query.q as string, parseInt(route.query.offset as string) || 0);
+  const query = route.query.q as string;
+  const offset = parseInt(route.query.offset as string) || 0;
+  console.log('Fetching results for query:', query, 'offset:', offset);
+  fetchResults(query, offset);
 });
 
 watch(
   () => [route.query.q, route.query.offset],
   ([newQuery, newOffset]) => {
+    console.log('Query or offset changed:', newQuery, newOffset);
     fetchResults(newQuery as string, parseInt(newOffset as string) || 0);
   }
 );
@@ -113,7 +208,7 @@ const handlePrevious = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: var(--spacing-unit);
+  padding-top: 6vh;
   width: 90%;
   max-width: 50rem;
   margin: 0 auto;
@@ -154,6 +249,7 @@ h1 {
 }
 
 .result {
+  position: relative;
   background: var(--color-background);
   padding: 1rem;
   border-radius: var(--border-radius);
@@ -161,24 +257,25 @@ h1 {
   box-shadow: 0.25rem 0.25rem 0.5rem var(--shadow-dark), -0.25rem -0.25rem 0.5rem var(--shadow-light);
 }
 
-.result-title {
-  margin: 0 0 0.5rem;
-  color: var(--color-primary);
+.score {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--color-primary); /* Purple, ~#9966CC */
+  background: var(--color-secondary); /* Secondary color */
+  padding: 0.2rem 0.6rem 0.2rem 0.4rem; /* Extra right padding for spacing */
+  border-radius: 0.3rem;
   font-family: 'Poppins', sans-serif;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  margin: 0;
 }
 
-.snippet {
-  margin: 0.5rem 0;
+.result p {
   color: var(--color-text);
   font-family: 'Poppins', sans-serif;
-  font-size: 1rem;
-}
-
-.snippet :deep(b) {
-  background: var(--color-secondary);
-  font-weight: 500;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
 }
 
 .result-url {
@@ -195,11 +292,26 @@ h1 {
   background: var(--color-secondary);
 }
 
-.last-modified {
-  color: var(--color-text-muted);
+.snippet {
+  color: var(--color-text);
   font-family: 'Poppins', sans-serif;
-  font-size: 0.8rem;
-  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.snippet :deep(b) {
+  font-weight: 700;
+  background: var(--color-secondary); /* Secondary color */
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.2rem;
+}
+
+.keywords, .parent-links, .child-links {
+  margin: 0.5rem 0;
+}
+
+.keywords p, .parent-links p, .child-links p {
+  margin: 0.2rem 0;
 }
 
 .pagination {
@@ -241,20 +353,20 @@ h1 {
     padding: 1.5rem;
   }
 
-  .result-title {
-    font-size: 1.4rem;
+  .score {
+    font-size: 1rem;
   }
 
-  .snippet {
-    font-size: 1.1rem;
+  .result p {
+    font-size: 1rem;
   }
 
   .result-url {
     font-size: 1rem;
   }
 
-  .last-modified {
-    font-size: 0.9rem;
+  .snippet {
+    font-size: 1rem;
   }
 
   .pagination-button {
@@ -262,4 +374,4 @@ h1 {
     padding: 0.8rem 1.5rem;
   }
 }
-</style>c
+</style>
