@@ -158,6 +158,17 @@ class IndexerDAO(db: DB) : IndexerDatabaseManager(db) {
     }
 
     /**
+     * Retrieves the keywords associated with a page.
+     *
+     * @param pageId the unique page identifier.
+     * @return a list of [Keyword] objects associated with the page.
+     */
+    fun getPageKeywords(pageId: String): List<Keyword> {
+        logger.info { "Retrieving keywords for pageId: $pageId" }
+        return forwardIndex[pageId] as? List<Keyword> ?: emptyList()
+    }
+
+    /**
      * Debug function to validate stored pages for a given word identifier.
      *
      * Logs information about the validity of title and body posts.

@@ -113,4 +113,23 @@ class CrawlerDAO(db: DB) : CrawlerDatabaseManager(db) {
         logger.debug { "[CrawlerDAO:getPageProperties] Retrieved properties for page ID: $pageId" }
         return properties
         }
+
+    /**
+     * Gets all page IDs from the database.
+     */
+    fun getAllPageIds(): List<String> {
+        return pageProperties.keys.toList()
+    }
+
+    /**
+     * Gets parent pages that link to the given page.
+     */
+    fun getParentPages(childPageId: String): List<String> {
+        return parentChildLinks
+            .filter { (_, children) ->
+                (children as? List<*>)?.contains(childPageId) == true
+            }
+            .keys
+            .toList()
+    }
 }
