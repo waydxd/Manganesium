@@ -14,7 +14,7 @@ class AppService {
     private val logger = KotlinLogging.logger {}
     private val crawlerDAO = CrawlerDAO("crawler.db")
     private val indexerDAO = IndexerDAO("indexer.db")
-    private val searchService = SearchService(crawlerDAO, indexerDAO);
+    private val searchService = SearchService(crawlerDAO, indexerDAO)
 
     init {
         // Register shutdown hook to close resources when JVM exits
@@ -41,7 +41,7 @@ class AppService {
             .mapNotNull { result ->
                 try {
                     val page = crawlerDAO.getPageProperties(result.pageId) ?: return@mapNotNull null
-                    val content = page["content"].toString() ?: ""
+                    val content = page["content"].toString()
                     val keywordStrings: List<List<String?>> = indexerDAO.getPageKeywords(result.pageId).map {
                         listOf(indexerDAO.getWordForWordId(it.wordID), it.frequency.toString())
                     }

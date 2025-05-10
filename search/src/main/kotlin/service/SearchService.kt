@@ -31,7 +31,6 @@ class SearchService(
     private val resultsCache = SynchronizedLRUCache<String, List<ScoredResult>>(resultsCacheSize)
     private val maxTfTitleCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
     private val maxTfBodyCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
-    private val termScoreCache = SynchronizedLRUCache<String, Double>(maxTfCacheSize)
     private val pageRankCache = SynchronizedLRUCache<String, Double>(maxTfCacheSize)
 
     /**
