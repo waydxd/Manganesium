@@ -34,4 +34,11 @@ class SynchronizedLRUCache<K, V>(private val capacity: Int) {
         cache[key] = newValue
         newValue
     }
+
+    /**
+     * Returns the current size of the cache.
+     */
+    fun size(): Int = synchronized(cache) {
+        return cache.size
+    }
 }
