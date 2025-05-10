@@ -167,32 +167,4 @@ class IndexerDAO(db: DB) : IndexerDatabaseManager(db) {
         logger.info { "Retrieving keywords for pageId: $pageId" }
         return forwardIndex[pageId] as? List<Keyword> ?: emptyList()
     }
-
-    /**
-     * Debug function to validate stored pages for a given word identifier.
-     *
-     * Logs information about the validity of title and body posts.
-     *
-     * @param wordId a unique identifier for the word.
-     */
-    private fun debugValidatePages(wordId: String) {
-        logger.debug { "Validating pages for wordId: $wordId" }
-        val titlePages = getPagesTitleForKeyword(wordId)
-        val bodyPages = getPagesBodyForKeyword(wordId)
-
-        titlePages.forEach { post ->
-            if (post.pageID.isNotBlank() && post.frequency >= 0) {
-                logger.debug { "Title post valid: $post" }
-            } else {
-                logger.warn { "Title post invalid: $post" }
-            }
-        }
-        bodyPages.forEach { post ->
-            if (post.pageID.isNotBlank() && post.frequency >= 0) {
-                logger.debug { "Body post valid: $post" }
-            } else {
-                logger.warn { "Body post invalid: $post" }
-            }
-        }
-    }
 }
