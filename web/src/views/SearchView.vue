@@ -9,7 +9,7 @@
       <div class="results">
         <div v-for="result in results" :key="result.url" class="result">
           <p class="score"><strong>Score - </strong><span class="score-value">{{ result.score || 'N/A' }}</span></p>
-          <p><strong>Page Title - </strong> {{ result.pageTitle || 'Untitled' }}</p>
+          <p id="title"><strong>Page Title - </strong> {{ result.pageTitle || 'Untitled' }}</p>
           <a
             :href="result.url || '#'"
             target="_blank"
@@ -317,6 +317,11 @@ h1 {
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   margin: 0.5rem 0;
+  border-radius: 16px;
+  background: var(--color-background);
+  box-shadow: inset 5px 5px 11px #d9d9d9,
+  inset -5px -5px 11px #ffffff;
+  padding: 1rem;
 }
 
 .snippet :deep(b) {
@@ -362,6 +367,11 @@ h1 {
 .pagination-button:disabled {
   background: #cccccc;
   cursor: not-allowed;
+}
+
+#title {
+  font-size: x-large;
+  font-weight: bold;
 }
 
 @media (min-width: 1024px) {
