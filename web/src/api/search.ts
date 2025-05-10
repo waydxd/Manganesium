@@ -93,10 +93,12 @@ export const search = async (
         snippet: item.snippet || '',
         score: item.score ?? undefined,
         pageSize: item.pageSize ?? undefined,
-        keywords: item.keywords ? item.keywords.map((kw: any) => ({
-          keyword: kw.keyword || '',
-          frequency: kw.frequency || 0
-        })) : undefined,
+        keywords: Array.isArray(item.keywords)
+          ? item.keywords.map((kw: any) => ({
+            keyword: kw[0] || '', // First element as keyword
+            frequency: kw[1] || 0 // Second element as frequency
+          }))
+          : [],
         parentLinks: item.parentLinks ? item.parentLinks.map((link: any) => link.toString()) : undefined,
         childLinks: item.childLinks ? item.childLinks.map((link: any) => link.toString()) : undefined
       };

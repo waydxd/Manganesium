@@ -8,7 +8,7 @@
       </p>
       <div class="results">
         <div v-for="result in results" :key="result.url" class="result">
-          <p class="score"><strong>Score - </strong><span class="score-value">{{ result.score || 'N/A' }}</span></p>
+          <p class="score"><strong>Score - </strong><span class="score-value">{{ roundToSignificantFigures(result.score, 3) || 'N/A' }}</span></p>
           <p id="title"><strong>Page Title - </strong> {{ result.pageTitle || 'Untitled' }}</p>
           <a
             :href="result.url || '#'"
@@ -179,7 +179,7 @@ const fetchResults = async (query: string, offset: number) => {
     if (data.length === 0) {
       error.value = 'No results returned. The search service may be initializing or the query yielded no matches.';
     }
-    results.value = data;
+    results.value = normalizeScores(data);
   } catch (err: any) {
     console.error('Search error:', err);
     error.value = err.message || 'Failed to fetch search results';
@@ -215,6 +215,26 @@ const handlePrevious = () => {
     const newOffset = currentOffset - limit;
     router.push({ path: '/search', query: { q: route.query.q, offset: newOffset.toString() } });
   }
+};
+
+const normalizeScores = (results: SearchResponse[]) => {
+  if (results.length === 0) return results;
+
+  const scores = results.map(result => result.score || 0);
+  const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
+
+  return results.map(result => {
+    const score = result.score || 0;
+    const normalizedScore = maxScore === minScore ? 1 : (score - minScore) / (maxScore - minScore);
+    return {
+      ...result,
+      normalizedScore: normalizedScore.toFixed(2), // Optional: Limit to 2 decimal places
+    };
+  });
+};
+const roundToSignificantFigures = (num: number, significantFigures: number): number => {
+  return parseFloat(num.toPrecision(significantFigures));
 };
 </script>
 
