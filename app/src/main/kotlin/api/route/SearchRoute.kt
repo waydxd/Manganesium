@@ -63,7 +63,7 @@ fun Application.configureRouting() {
 
                     logger.info { "Received search request: $query" }
 
-                    val request = app.api.model.SearchRequest(query, limit, offset)
+                    val request = SearchRequest(query, limit, offset)
                     val results = service.search(request)
                     call.respond(HttpStatusCode.OK, results)
                 } catch (e: Exception) {

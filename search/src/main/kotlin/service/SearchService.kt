@@ -6,7 +6,7 @@ import dataAccessObject.IndexerDAO
 import models.Keyword
 import models.Post
 import kotlin.math.log10
-
+import models.ScoredResult
 
 class SearchService(
     private val crawlerDao: CrawlerDAO,
@@ -21,49 +21,129 @@ class SearchService(
     private val wBody = 1.0
     // Total number of documents (assumed 300 as per project spec)
     private val numberDocs = 300
+    // Weight for combining term score and PageRank
+    private val alpha = 0.7
 
     // Thread-safe caches
     private val wordIdCache = SynchronizedLRUCache<String, String?>(wordIdCacheSize)
     private val titlePostingsCache = SynchronizedLRUCache<String, List<Post>>(postingsCacheSize)
     private val bodyPostingsCache = SynchronizedLRUCache<String, List<Post>>(postingsCacheSize)
-    private val resultsCache = SynchronizedLRUCache<String, List<String>>(resultsCacheSize)
+    private val resultsCache = SynchronizedLRUCache<String, List<ScoredResult>>(resultsCacheSize)
     private val maxTfTitleCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
     private val maxTfBodyCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
+    private val termScoreCache = SynchronizedLRUCache<String, Double>(maxTfCacheSize)
+    private val pageRankCache = SynchronizedLRUCache<String, Double>(maxTfCacheSize)
 
     /**
-     * Searches the index for documents matching the query and returns the top 50 ranked document IDs.
-     * @param query The user query string containing terms and phrases (e.g., "hong kong" universities)
-     * @return List of up to 50--page IDs in descending order of relevance
+     * Searches the index for documents matching the query and returns ranked document IDs with scores.
+     * @param query The user query string containing terms and phrases
+     * @return List of scored results in descending order of relevance
      */
-    fun search(query: String): List<String> {
+    fun search(query: String): List<ScoredResult> {
         // Check results cache first
         resultsCache.get(query)?.let { return it }
 
+        val termScores = calculateTermScores(query)
+        val pageRanks = calculatePageRanks()
+
+        // Calculate final scores using the formula: alpha * term_score + (1-alpha) * pageRank
+        val finalScores = mutableListOf<ScoredResult>()
+
+        for ((pageId, termScore) in termScores) {
+            val pageRank = pageRanks[pageId] ?: 0.0
+            val finalScore = alpha * termScore + (1 - alpha) * pageRank
+            finalScores.add(ScoredResult(pageId, finalScore))
+        }
+
+        val rankedResults = finalScores.sortedByDescending { it.score }.take(50)
+        resultsCache.put(query, rankedResults)
+        return rankedResults
+    }
+//    /**
+//     * Gets just the page IDs from search results.
+//     * Retains backward compatibility with existing code.
+//     */
+//    fun searchPageIds(query: String): List<String> {
+//        return search(query).map { it.pageId }
+//    }
+
+    /**
+     * Calculate term scores for a query
+     */
+    private fun calculateTermScores(query: String): Map<String, Double> {
         val components = parseQuery(query)
         val scores = mutableMapOf<String, Double>()
 
-        // Process each query component (term or phrase)
         for (component in components) {
             if (component.startsWith("\"") && component.endsWith("\"")) {
-                // Handle phrase query
                 val phrase = component.trim('"').split("\\s+".toRegex())
                 if (phrase.size > 1) processPhrase(phrase, scores)
-                else processTerm(phrase[0], scores) // Single-word phrase treated as term
+                else processTerm(phrase[0], scores)
             } else {
-                // Handle individual term
                 processTerm(component, scores)
             }
         }
 
-        // Rank documents by score and select top 50
-        val rankedResults = scores.entries
-            .sortedByDescending { it.value }
-            .take(50)
-            .map { it.key }
+        return scores
+    }
 
-        // Store in results cache
-        resultsCache.put(query, rankedResults)
-        return rankedResults
+//    /**
+//     * Gets the term score for a specific page and query.
+//     * Used by AppService when combining with PageRank.
+//     */
+//    fun getTermScore(pageId: String, query: String): Double {
+//        val cacheKey = "$pageId:$query"
+//        termScoreCache.get(cacheKey)?.let { return it }
+//
+//        val scores = calculateTermScores(query)
+//        val score = scores[pageId] ?: 0.0
+//
+//        termScoreCache.put(cacheKey, score)
+//        return score
+//    }
+
+    /**
+     * Calculate PageRank scores for all pages based on incoming links.
+     * This is a simplified implementation that normalizes by the maximum number of links.
+     */
+    private fun calculatePageRanks(): Map<String, Double> {
+        // Try getting from cache
+        if (pageRankCache.size() > 0) {
+            val allPageIds = crawlerDao.getAllPageIds()
+            val cachedRanks = allPageIds.mapNotNull { pageId ->
+                pageRankCache.get(pageId)?.let { pageId to it }
+            }
+            if (cachedRanks.size == allPageIds.size) {
+                return cachedRanks.toMap()
+            }
+        }
+
+        // Calculate PageRank from scratch
+        val allPages = crawlerDao.getAllPageIds()
+        val incomingLinks = mutableMapOf<String, Int>()
+
+        // Count incoming links for each page
+        allPages.forEach { pageId ->
+            val parentPages = crawlerDao.getParentPages(pageId)
+            incomingLinks[pageId] = parentPages.size
+        }
+
+        // Normalize scores to be between 0 and 1
+        val maxLinks = incomingLinks.values.maxOrNull()?.toDouble() ?: 1.0
+        val results = if (maxLinks > 0) {
+            allPages.associateWith { pageId ->
+                (incomingLinks[pageId]?.toDouble() ?: 0.0) / maxLinks
+            }
+        } else {
+            allPages.associateWith { 0.0 }
+        }
+
+        // Cache the results
+        results.forEach { (pageId, score) ->
+            pageRankCache.put(pageId, score)
+        }
+
+        return results
     }
 
     /**

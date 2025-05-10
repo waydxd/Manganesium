@@ -38,20 +38,34 @@ class AppService {
         return pageIds
             .drop(request.offset)
             .take(request.limit)
-            .mapNotNull { pageId ->
+            .mapNotNull { result ->
                 try {
-                    val page = crawlerDAO.getPageProperties(pageId) ?: return@mapNotNull null
+                    val page = crawlerDAO.getPageProperties(result.pageId) ?: return@mapNotNull null
                     val content = page["content"].toString() ?: ""
-
+                    val keywordStrings: List<List<String?>> = indexerDAO.getPageKeywords(result.pageId).map {
+                        listOf(indexerDAO.getWordForWordId(it.wordID), it.frequency.toString())
+                    }
+                    val parentLinks: List<String> = crawlerDAO.getParentPages(result.pageId).map {
+                        crawlerDAO.getPageProperties(it)?.get("url").toString()
+                    }
+                    val childLinks: List<String> = crawlerDAO.getChildPages(result.pageId).map {
+                        crawlerDAO.getPageProperties(it)?.get("url").toString()
+                    }
+                    logger.info {  }
                     SearchResponse(
-                        pageID = pageId,
+                        pageID = result.pageId,
                         title = page["title"].toString(),
                         url = page["url"].toString(),
                         lastModified = formatDate(page["lastModified"].toString()),
-                        snippet = generateSnippet(content, request.query)
+                        snippet = generateSnippet(content, request.query),
+                        score = result.score,
+                        pageSize = page["size"].toString().toIntOrNull() ?: 0,
+                        keywords = keywordStrings,
+                        parentLinks = parentLinks,
+                        childLinks = childLinks
                     )
                 } catch (e: Exception) {
-                    logger.error(e) { "Error creating SearchResponse for pageId: $pageId" }
+                    logger.error(e) { "Error creating SearchResponse for pageId: $result" }
                     null
                 }
             }

@@ -18,4 +18,9 @@ data class SearchResponse(
     val url: String,
     val lastModified: String,
     val snippet: String,
-)
+    val score: Double = 0.0, // Default score to 0.0
+    val pageSize: Int, // Size of the page content in bytes
+    val keywords: List<List<String?>> = emptyList(),
+    val parentLinks: List<String> = emptyList(),
+    val childLinks: List<String> = emptyList(),
+    )
