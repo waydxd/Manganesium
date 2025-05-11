@@ -8,8 +8,8 @@
       </p>
       <div class="results">
         <div v-for="result in results" :key="result.url" class="result">
-          <p class="score"><strong>Score - </strong><span class="score-value">{{ roundToSignificantFigures(result.score, 3) || 'N/A' }}</span></p>
-          <p id="title"><strong>Page Title - </strong> {{ result.pageTitle || 'Untitled' }}</p>
+          <p class="score"><strong>Score - </strong><span class="score-value">{{ roundToSignificantFigures(result.score, 3) || 'N/A' }}%</span></p>
+          <p id="title">{{ result.pageTitle || 'Untitled' }}</p>
           <a
             :href="result.url || '#'"
             target="_blank"
@@ -17,23 +17,27 @@
             class="result-url"
           >{{ result.url || 'No URL available' }}</a>
           <p v-if="result.lastModified && isValidDate(result.lastModified)">
-            <strong>Last Modification Date - </strong> {{ formatDate(result.lastModified) }}
+            <strong>Last Modified at </strong> {{ formatDate(result.lastModified) }}
           </p>
           <p v-else><strong>Last Modification Date - </strong> N/A</p>
-          <p><strong>Size of Page - </strong> {{ result.pageSize ? result.pageSize + ' bytes' : 'N/A' }}</p>
+          <p><strong>Page Size - </strong> {{ result.pageSize ? result.pageSize + ' bytes' : 'N/A' }}</p>
+
           <div v-if="result.keywords && result.keywords.length > 0" class="keywords">
-            <p v-for="kw in result.keywords" :key="kw.keyword">
-              {{ kw.keyword }} {{ kw.frequency }}
-            </p>
+            Top 10 stemmed keywords - <br/>
+            <span v-for="(kw, index) in result.keywords" :key="kw.keyword">
+              <strong>{{ kw.keyword }}</strong> ({{ kw.frequency }}){{ index < result.keywords.length - 1 ? ', ' : '' }}
+            </span>
           </div>
           <div v-else><p>No keywords available</p></div>
           <div v-if="result.parentLinks && result.parentLinks.length > 0" class="parent-links">
+            Parent Links -
             <p v-for="link in result.parentLinks" :key="link">
               <a :href="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
             </p>
           </div>
           <div v-else><p>No parent links available</p></div>
           <div v-if="result.childLinks && result.childLinks.length > 0" class="child-links">
+            Child Links -
             <p v-for="link in result.childLinks" :key="link">
               <a :href="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
             </p>
@@ -64,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { parse, isValid, format } from 'date-fns';
 import { search } from '../api/search';
@@ -179,7 +183,7 @@ const fetchResults = async (query: string, offset: number) => {
     if (data.length === 0) {
       error.value = 'No results returned. The search service may be initializing or the query yielded no matches.';
     }
-    results.value = normalizeScores(data);
+    results.value = data;
   } catch (err: any) {
     console.error('Search error:', err);
     error.value = err.message || 'Failed to fetch search results';
@@ -216,25 +220,9 @@ const handlePrevious = () => {
     router.push({ path: '/search', query: { q: route.query.q, offset: newOffset.toString() } });
   }
 };
-
-const normalizeScores = (results: SearchResponse[]) => {
-  if (results.length === 0) return results;
-
-  const scores = results.map(result => result.score || 0);
-  const minScore = Math.min(...scores);
-  const maxScore = Math.max(...scores);
-
-  return results.map(result => {
-    const score = result.score || 0;
-    const normalizedScore = maxScore === minScore ? 1 : (score - minScore) / (maxScore - minScore);
-    return {
-      ...result,
-      normalizedScore: normalizedScore.toFixed(2), // Optional: Limit to 2 decimal places
-    };
-  });
-};
-const roundToSignificantFigures = (num: number, significantFigures: number): number => {
-  return parseFloat(num.toPrecision(significantFigures));
+const roundToSignificantFigures = (num: number | undefined, significantFigures: number): number => {
+  if (num === undefined) return 0; // Return 0 if num is undefined
+  return parseFloat(Number(num * 100).toPrecision(significantFigures)) ;
 };
 </script>
 
@@ -260,7 +248,7 @@ h1 {
 }
 
 .search-container {
-  width: 100%;
+  width: 105%;
   background: var(--color-background);
   padding: var(--spacing-unit);
   border-radius: var(--border-radius);
@@ -308,7 +296,8 @@ h1 {
 .score-value {
   background: var(--color-secondary); /* Secondary color */
   padding: 0.2rem 0.6rem 0.2rem 0.4rem; /* Extra right padding for spacing */
-  border-radius: 0.3rem;
+  border-radius: 1rem;
+  color: var(--color-primary);
 }
 
 .result p {
@@ -392,6 +381,7 @@ h1 {
 #title {
   font-size: x-large;
   font-weight: bold;
+  padding-top: 1rem;
 }
 
 @media (min-width: 1024px) {
@@ -422,6 +412,17 @@ h1 {
   .pagination-button {
     font-size: 1rem;
     padding: 0.8rem 1.5rem;
+  }
+
+  .child-links p a{
+    color: var(--color-primary);
+    text-decoration: none;
+
+  }
+  .parent-links p a{
+    color: var(--color-primary);
+    text-decoration: none;
+
   }
 }
 </style>

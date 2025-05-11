@@ -127,8 +127,7 @@ main {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding-top: 4rem;
+  padding-top: 15%;
   padding-bottom: 3rem;
 }
 

@@ -1,13 +1,13 @@
 <template>
   <div class="home">
+    <img
+      alt="Manganesium logo"
+      class="logo"
+      src="@/assets/logo.png"
+      width="60"
+      height="60"
+    />
     <div class="header">
-      <img
-        alt="Manganesium logo"
-        class="logo"
-        src="@/assets/logo.png"
-        width="60"
-        height="60"
-      />
       <h1>Manganesium</h1>
     </div>
     <form @submit.prevent="handleSearch" aria-label="Search form" class="search-form">
@@ -22,19 +22,68 @@
         <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
       </button>
     </form>
+
+    <!-- Display Search History -->
+    <div v-if="searchHistory.length > 0" class="search-history">
+      <h3>Recent Searches:</h3>
+      <ul>
+        <li v-for="(item, index) in searchHistory" :key="index">
+          <a href="#" @click.prevent="handleHistorySearch(item)">{{ item }}</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const query = ref('');
 const router = useRouter();
+const searchHistory = ref<string[]>([]);
+
+const LOCAL_STORAGE_KEY = 'searchHistory';
+const MAX_HISTORY_LENGTH = 5;
+
+// Load search history from local storage on component mount
+onMounted(() => {
+  loadSearchHistory();
+});
 
 const handleSearch = () => {
   if (query.value.trim()) {
+    saveSearchQuery(query.value.trim());
     router.push({ path: '/search', query: { q: query.value } });
+  }
+};
+
+const handleHistorySearch = (historyItem: string) => {
+  query.value = historyItem;
+  saveSearchQuery(historyItem); // Save the history item to local storage
+  router.push({ path: '/search', query: { q: historyItem } });
+};
+
+// Save search query to local storage
+const saveSearchQuery = (searchQuery: string) => {
+  let history = [...searchHistory.value];
+
+  // Check if the query already exists in history
+  if (!history.includes(searchQuery)) {
+    history.unshift(searchQuery); // Add to the beginning
+    if (history.length > MAX_HISTORY_LENGTH) {
+      history.pop(); // Remove the oldest entry
+    }
+    searchHistory.value = history;
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
+  }
+};
+
+// Load search history from local storage
+const loadSearchHistory = () => {
+  const storedHistory = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (storedHistory) {
+    searchHistory.value = JSON.parse(storedHistory);
   }
 };
 </script>
@@ -58,8 +107,8 @@ const handleSearch = () => {
 }
 
 .logo {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 10rem !important;
+  height: 10rem !important;
   border-radius: 50%;
   box-shadow: 0.25rem 0.25rem 0.5rem var(--shadow-dark), -0.25rem -0.25rem 0.5rem var(--shadow-light);
 }
@@ -76,7 +125,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 1.5rem; /* Increased separation */
-  width: 95%;
+  width: 50rem;
   max-width: 60rem; /* Longer search bar */
 }
 
@@ -131,6 +180,39 @@ h1 {
   font-size: 1.2rem;
 }
 
+.search-history {
+  margin-top: 20px;
+  width: 50rem;
+  max-width: 60rem;
+  text-align: left;
+}
+
+.search-history h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+}
+
+.search-history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.search-history li {
+  margin-bottom: 0.5rem;
+}
+
+.search-history a {
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.search-history a:hover {
+  text-decoration: underline;
+  color: var(--color-secondary);
+}
+
 @media (min-width: 1024px) {
   .header {
     gap: 1.5vw;
@@ -165,6 +247,10 @@ h1 {
 
   .search-button svg {
     font-size: 1.4rem;
+  }
+
+  .search-history {
+    max-width: 70rem;
   }
 }
 </style>
