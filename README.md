@@ -39,7 +39,7 @@ Manganesium
 ```
 ## Technologies Used
 The project is built using the following technologies:
-- **Vue.js** (frontend)
+- **Vue.js & Vite** (frontend)
 - **Kotlin** (backend)
   - MapDB
   - Jsoup
@@ -49,6 +49,7 @@ The project is built using the following technologies:
   - Kotlin-Logging
   - Logback
   - Mockito
+  - Ktor
 
 ## Installation
 To install and run this project locally, follow these steps:
@@ -79,17 +80,52 @@ To install and run this project locally, follow these steps:
       ```
 
 ## Usage
-To run the project test program, follow these steps:
+To run the *project test program* for **Phase 1**, follow these steps:
 ```bash
-./gradlew run
+./gradlew runTest
 ``` 
 or if you have gradle installed:
 ```bash
-gradle run
+gradle runTest
 ```
 then the `crawler.db`, `indexer.db` and `spider_test.txt` will be generated in the root directory.
 
 Alternatively, you can run the test program by running the `Main.kt` file in the `app/src/main/kotlin` directory using IntelliJ IDEA.
+
+To run the **search engine backend** for **Final Phase**, follow these steps:
+```bash
+./gradlew run
+```
+or if you have gradle installed:
+```bash
+gradle run
+```
+Then the search engine will start crawling first and then the api listener will start listening on port 8080. You can access the api by navigating to `http://localhost:8080/api/health` in your web browser.
+
+You can specify port by setting the `PORT` environment variable. For example, to run the backend on port 8081, you can run:
+```bash
+PORT=8081 gradle run
+```
+_Note that if you changed to use ports other than 8080. You will need to specify the backend address in web/.env in order to let the frontend to bind it. 
+An example .env.default has been provided for you for reference._
+
+For the frontend vue app, navigate to the `web` directory and run the following command:
+```bash
+npm run build
+npm run preview
+```
+or if you have vite installed globally:
+```bash
+vite build
+vite preview
+```
+Then the frontend website will be available at `http://localhost:4173` in your web browser.
+
+For simplicity, a run.sh has been made to run the backend and frontend at the same time. To run the script, navigate to the root directory and run:
+```bash
+chmod +x run.sh
+./run.sh
+```
 ## Contributing
 Contributions are welcome! Please follow these steps to contribute:
 
@@ -109,4 +145,4 @@ Contributions are welcome! Please follow these steps to contribute:
 5. **Create a new Pull Request**.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL-3.0 license. See the [LICENSE](LICENSE) file for details.

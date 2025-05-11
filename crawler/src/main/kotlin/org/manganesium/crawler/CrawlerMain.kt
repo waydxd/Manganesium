@@ -3,6 +3,8 @@ package org.manganesium.crawler
 import dataAccessObject.CrawlerDAO
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.manganesium.indexer.Indexer
+import kotlin.time.Duration
+import kotlin.time.measureTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -51,8 +53,9 @@ fun main() {
     //  - maxDepth = 3 (or any depth you need)
     //  - maxPages = 30 so it stops exactly after 30 pages
     logger.info { "[Main:main] Starting the crawling process" }
-    crawler.startCrawling(startUrls, maxDepth = 10, maxPages = 300, indexer)
-
+    val timeTaken: Duration = measureTime {
+        crawler.startCrawling(startUrls, maxDepth = 10, maxPages = 300, indexer)
+    }
     // Wait for all indexing tasks to complete
     crawler.shutdown()
 
@@ -62,7 +65,10 @@ fun main() {
 
     logger.info { "[Main:main] Crawling and indexing process completed" }
     logger.info { "[Main:main] Total pages visited: ${crawler.visitedUrls.size}" }
+    logger.info { "[Main:main] Time taken for crawling: $timeTaken" }
 
     println("Crawling summary:")
     println("Total pages visited: ${crawler.visitedUrls.size}")
+    println("Time taken for crawling: ${timeTaken.inWholeSeconds}s")
+
 }

@@ -29,18 +29,17 @@ dependencies {
     testImplementation(kotlin("test"))
 
 }
-tasks.register<JavaExec>("runTestMain") {
+tasks.register<JavaExec>("runTest") {
     group = "application"
     description = "Runs a specific main class for testing purposes."
     classpath = sourceSets["test"].runtimeClasspath
-    mainClass.set("your.test.MainClass") // Replace with your test main class
+    mainClass.set("app.TestMainKt") // Replace with your test main class
     dependsOn("testClasses") // Ensure test classes are compiled
     workingDir = rootDir
 }
 
 tasks.test {
     useJUnitPlatform()
-    finalizedBy(tasks.named("runTestMain"))
 }
 kotlin {
     jvmToolchain(23)
