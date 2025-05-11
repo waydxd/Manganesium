@@ -1,5 +1,5 @@
 # COMP4321 Group 25 - Manganesium
-
+# ** !ALL DOCUMENTS ARE INSIDE /docs DIRECTORY, PLEASE DO NOT IGNORE THEM**
 ## Project Description
 This project is a comprehensive application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
 Design documents and other project-related files can be found in the [docs](docs) directory.
