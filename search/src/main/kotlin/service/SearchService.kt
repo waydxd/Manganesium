@@ -14,17 +14,15 @@ class SearchService(
     private val wordIdCacheSize: Int = 1000,
     private val postingsCacheSize: Int = 500,
     private val resultsCacheSize: Int = 100,
-    private val maxTfCacheSize: Int = 300 // Cache for all 300 pages
+    private val maxTfCacheSize: Int = 300
 ) {
-    // Weights to favor title matches
     private val wTitle = 10.0
     private val wBody = 1.0
-    // Total number of documents (assumed 300 as per project spec)
-    private val numberDocs = 300
-    // Weight for combining term score and PageRank
+    private val numberDocs = crawlerDao.getAllPageIds().size
     private val alpha = 0.7
+    private val dampingFactor = 0.85
+    private val maxIterations = 10
 
-    // Thread-safe caches
     private val wordIdCache = SynchronizedLRUCache<String, String?>(wordIdCacheSize)
     private val titlePostingsCache = SynchronizedLRUCache<String, List<Post>>(postingsCacheSize)
     private val bodyPostingsCache = SynchronizedLRUCache<String, List<Post>>(postingsCacheSize)
@@ -32,6 +30,7 @@ class SearchService(
     private val maxTfTitleCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
     private val maxTfBodyCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
     private val pageRankCache = SynchronizedLRUCache<String, Double>(maxTfCacheSize)
+    private val documentLengthCache = SynchronizedLRUCache<String, Int>(maxTfCacheSize)
 
     /**
      * Searches the index for documents matching the query and returns ranked document IDs with scores.
@@ -39,13 +38,11 @@ class SearchService(
      * @return List of scored results in descending order of relevance
      */
     fun search(query: String): List<ScoredResult> {
-        // Check results cache first
         resultsCache.get(query)?.let { return it }
 
         val termScores = calculateTermScores(query)
         val pageRanks = calculatePageRanks()
 
-        // Calculate final scores using the formula: alpha * term_score + (1-alpha) * pageRank
         val finalScores = mutableListOf<ScoredResult>()
 
         for ((pageId, termScore) in termScores) {
@@ -54,17 +51,18 @@ class SearchService(
             finalScores.add(ScoredResult(pageId, finalScore))
         }
 
-        val rankedResults = finalScores.sortedByDescending { it.score }.take(50)
+        // Normalize final scores
+        val maxScore = finalScores.maxOfOrNull { it.score } ?: 0.0
+        val normalizedScores = if (maxScore > 0) {
+            finalScores.map { ScoredResult(it.pageId, it.score / maxScore) }
+        } else {
+            finalScores
+        }
+
+        val rankedResults = normalizedScores.sortedByDescending { it.score }.take(50)
         resultsCache.put(query, rankedResults)
         return rankedResults
     }
-//    /**
-//     * Gets just the page IDs from search results.
-//     * Retains backward compatibility with existing code.
-//     */
-//    fun searchPageIds(query: String): List<String> {
-//        return search(query).map { it.pageId }
-//    }
 
     /**
      * Calculate term scores for a query
@@ -86,20 +84,6 @@ class SearchService(
         return scores
     }
 
-//    /**
-//     * Gets the term score for a specific page and query.
-//     * Used by AppService when combining with PageRank.
-//     */
-//    fun getTermScore(pageId: String, query: String): Double {
-//        val cacheKey = "$pageId:$query"
-//        termScoreCache.get(cacheKey)?.let { return it }
-//
-//        val scores = calculateTermScores(query)
-//        val score = scores[pageId] ?: 0.0
-//
-//        termScoreCache.put(cacheKey, score)
-//        return score
-//    }
 
     /**
      * Calculate PageRank scores for all pages based on incoming links.
@@ -117,32 +101,48 @@ class SearchService(
             }
         }
 
-        // Calculate PageRank from scratch
-        val allPages = crawlerDao.getAllPageIds()
-        val incomingLinks = mutableMapOf<String, Int>()
+        val allPages = crawlerDao.getAllPageIds().toSet()
+        val incomingLinksMap = mutableMapOf<String, MutableSet<String>>()
+        val outgoingLinksMap = mutableMapOf<String, MutableSet<String>>()
 
-        // Count incoming links for each page
         allPages.forEach { pageId ->
-            val parentPages = crawlerDao.getParentPages(pageId)
-            incomingLinks[pageId] = parentPages.size
+            incomingLinksMap[pageId] = crawlerDao.getParentPages(pageId).toMutableSet()
+            outgoingLinksMap[pageId] = crawlerDao.getChildPages(pageId).toMutableSet()
         }
 
-        // Normalize scores to be between 0 and 1
-        val maxLinks = incomingLinks.values.maxOrNull()?.toDouble() ?: 1.0
-        val results = if (maxLinks > 0) {
-            allPages.associateWith { pageId ->
-                (incomingLinks[pageId]?.toDouble() ?: 0.0) / maxLinks
+        var pageRanks = allPages.associateWith { 1.0 / allPages.size }.toMutableMap()
+        val newPageRanks = mutableMapOf<String, Double>()
+
+        for (i in 0 until maxIterations) {
+            for (page in allPages) {
+                var rank = (1 - dampingFactor) / allPages.size
+
+                for (linkingPage in incomingLinksMap[page] ?: emptySet()) {
+                    val numOutgoingLinks = outgoingLinksMap[linkingPage]?.size ?: 0
+                    rank += dampingFactor * (pageRanks[linkingPage] ?: 0.0) / (numOutgoingLinks.toDouble().takeIf { it > 0 } ?: 1.0)
+                }
+                newPageRanks[page] = rank
             }
-        } else {
-            allPages.associateWith { 0.0 }
+            // Check for convergence
+            val delta = newPageRanks.map { (page, newRank) ->
+                kotlin.math.abs(newRank - (pageRanks[page] ?: 0.0))
+            }.sum()
+
+            if (delta < 1e-5) {
+                break
+            }
+            pageRanks = newPageRanks.toMutableMap()
         }
 
-        // Cache the results
-        results.forEach { (pageId, score) ->
+        // Normalize and cache results
+        val sumRanks = pageRanks.values.sum()
+        val normalizedRanks = pageRanks.mapValues { (_, rank) -> rank / sumRanks }
+
+        normalizedRanks.forEach { (pageId, score) ->
             pageRankCache.put(pageId, score)
         }
 
-        return results
+        return normalizedRanks
     }
 
     /**
@@ -155,21 +155,18 @@ class SearchService(
         val chars = query.trim().toCharArray()
 
         while (i < chars.size) {
-            // Skip whitespace
             while (i < chars.size && chars[i].isWhitespace()) i++
             if (i >= chars.size) break
 
             if (chars[i] == '"') {
-                // Start of a phrase
                 val start = i
-                i++ // Skip opening quote
+                i++
                 while (i < chars.size && chars[i] != '"') i++
                 if (i < chars.size) {
-                    components.add(query.substring(start, i + 1)) // Include quotes
-                    i++ // Skip closing quote
+                    components.add(query.substring(start, i + 1))
+                    i++
                 }
             } else {
-                // Start of a term
                 val start = i
                 while (i < chars.size && !chars[i].isWhitespace()) i++
                 components.add(query.substring(start, i))
@@ -182,29 +179,26 @@ class SearchService(
      * Processes an individual term and updates document scores.
      */
     private fun processTerm(term: String, scores: MutableMap<String, Double>) {
-        // Check word ID cache
         val wordId = wordIdCache.getOrPut(term) { indexerDao.getWordIdForWord(term) } ?: return
-        // Check postings caches
+
         val titlePostings = titlePostingsCache.getOrPut(wordId) { indexerDao.getPagesTitleForKeyword(wordId) }
         val bodyPostings = bodyPostingsCache.getOrPut(wordId) { indexerDao.getPagesBodyForKeyword(wordId) }
 
-        // Compute document frequency (df) and inverse document frequency (idf)
         val allDocs = (titlePostings.map { it.pageID } + bodyPostings.map { it.pageID }).toSet()
         val df = allDocs.size
         if (df == 0) return
         val idf = log10(numberDocs.toDouble() / df)
 
-        // Score each document containing the term
-        val postings = titlePostings + bodyPostings
-        for (post in postings) {
+        for (post in titlePostings + bodyPostings) {
             val pageId = post.pageID
             val tfTitle = titlePostings.find { it.pageID == pageId }?.frequency ?: 0
             val tfBody = bodyPostings.find { it.pageID == pageId }?.frequency ?: 0
             val maxTfTitle = getMaxTfTitle(pageId)
             val maxTfBody = getMaxTfBody(pageId)
-
-            val weightTitle = if (maxTfTitle > 0) (tfTitle.toDouble() / maxTfTitle) * idf else 0.0
-            val weightBody = if (maxTfBody > 0) (tfBody.toDouble() / maxTfBody) * idf else 0.0
+            // Incorporate document length
+            val docLength = getDocumentLength(pageId)
+            val weightTitle = if (maxTfTitle > 0) (tfTitle.toDouble() / maxTfTitle) * idf / docLength else 0.0
+            val weightBody = if (maxTfBody > 0) (tfBody.toDouble() / maxTfBody) * idf / docLength else 0.0
             val docWeight = wTitle * weightTitle + wBody * weightBody
 
             scores[pageId] = scores.getOrDefault(pageId, 0.0) + docWeight
@@ -218,15 +212,13 @@ class SearchService(
         val wordIds = phrase.mapNotNull { word ->
             wordIdCache.getOrPut(word) { indexerDao.getWordIdForWord(word) }
         }
-        if (wordIds.size != phrase.size) return // Skip if any term is not indexed
+        if (wordIds.size != phrase.size) return
 
-        // Find candidate documents containing all terms
         val candidateDocs = findCandidateDocs(wordIds)
         val phraseDocs = mutableSetOf<String>()
         val tfPhraseTitle = mutableMapOf<String, Int>()
         val tfPhraseBody = mutableMapOf<String, Int>()
 
-        // Compute phrase frequencies for each candidate document
         for (doc in candidateDocs) {
             val titlePositions = wordIds.map { getPositions(it, doc, "title") }
             val bodyPositions = wordIds.map { getPositions(it, doc, "body") }
@@ -243,7 +235,6 @@ class SearchService(
             }
         }
 
-        // Compute idf and score documents
         val dfPhrase = phraseDocs.size
         if (dfPhrase == 0) return
         val idfPhrase = log10(numberDocs.toDouble() / dfPhrase)
@@ -253,9 +244,10 @@ class SearchService(
             val tfBody = tfPhraseBody.getOrDefault(doc, 0)
             val maxTfTitle = getMaxTfTitle(doc)
             val maxTfBody = getMaxTfBody(doc)
-
-            val weightTitle = if (maxTfTitle > 0) (tfTitle.toDouble() / maxTfTitle) * idfPhrase else 0.0
-            val weightBody = if (maxTfBody > 0) (tfBody.toDouble() / maxTfBody) * idfPhrase else 0.0
+            // Incorporate document length
+            val docLength = getDocumentLength(doc)
+            val weightTitle = if (maxTfTitle > 0) (tfTitle.toDouble() / maxTfTitle) * idfPhrase / docLength else 0.0
+            val weightBody = if (maxTfBody > 0) (tfBody.toDouble() / maxTfBody) * idfPhrase / docLength else 0.0
             val docWeight = wTitle * weightTitle + wBody * weightBody
 
             scores[doc] = scores.getOrDefault(doc, 0.0) + docWeight
@@ -292,30 +284,46 @@ class SearchService(
      */
     private fun computePhraseFrequency(posLists: List<List<Int>>): Int {
         if (posLists.any { it.isEmpty() } || posLists.isEmpty()) return 0
-        val k = posLists.size
-        val sortedLists = posLists.map { it.sorted() }
-        var count = 0
-        val indices = IntArray(k) { 0 }
 
-        while (indices[0] < sortedLists[0].size) {
-            val positions = (0 until k).map { i ->
-                sortedLists[i][indices[i]]
+        val k = posLists.size
+        val indices = IntArray(k) { 0 }
+        var count = 0
+
+        // Sort position lists for each term
+        val sortedPosLists = posLists.map { it.sorted() }
+
+        while (true) {
+            // Get current positions
+            val currentPositions = (0 until k).map { i ->
+                sortedPosLists[i].getOrNull(indices[i]) ?: return count // If any list is exhausted, return
             }
-            if ((1 until k).all { positions[it] == positions[it - 1] + 1 }) {
-                count++
+
+            // Check if all positions are valid (not null)
+            if (currentPositions.any { it == null }) {
+                break // If any list is exhausted, exit loop
+            }
+
+            // Check if the positions are consecutive
+            if ((1 until k).all { currentPositions[it] == currentPositions[it - 1]!! + 1 }) {
+                count++ // Increment count if consecutive
+
                 // Advance all indices
                 for (i in 0 until k) {
                     indices[i]++
-                    if (indices[i] >= sortedLists[i].size && i < k - 1) return count
                 }
             } else {
-                // Advance the index of the smallest position
-                val minPos = positions.minOrNull()!!
-                val minIdx = positions.indexOfFirst { it == minPos }
-                indices[minIdx]++
-                if (indices[minIdx] >= sortedLists[minIdx].size) break
+                // Find the minimum position and advance its index
+                val minPosition = currentPositions.filterNotNull().minOrNull() ?: break
+                val minIndex = currentPositions.indexOf(minPosition)
+                indices[minIndex]++
+            }
+
+            // Check if any index has reached the end of its list
+            if ((0 until k).any { indices[it] >= sortedPosLists[it].size }) {
+                break // Exit loop if any list is exhausted
             }
         }
+
         return count
     }
 
@@ -325,7 +333,6 @@ class SearchService(
     private fun getMaxTfTitle(pageId: String): Int {
         return maxTfTitleCache.getOrPut(pageId) {
             val keywords = indexerDao.forwardIndex[pageId] as? List<Keyword> ?: return@getOrPut 1
-            // Filter keywords that appear in the title (check invertedTitle)
             val titleKeywords = keywords.filter { keyword ->
                 indexerDao.getPagesTitleForKeyword(keyword.wordID).any { it.pageID == pageId }
             }
@@ -339,11 +346,20 @@ class SearchService(
     private fun getMaxTfBody(pageId: String): Int {
         return maxTfBodyCache.getOrPut(pageId) {
             val keywords = indexerDao.forwardIndex[pageId] as? List<Keyword> ?: return@getOrPut 1
-            // Filter keywords that appear in the body (check invertedBody)
             val bodyKeywords = keywords.filter { keyword ->
                 indexerDao.getPagesBodyForKeyword(keyword.wordID).any { it.pageID == pageId }
             }
             bodyKeywords.maxOfOrNull { it.frequency } ?: 1
+        }
+    }
+
+    /**
+     * Computes the document length for normalization.
+     */
+    private fun getDocumentLength(pageId: String): Int {
+        return documentLengthCache.getOrPut(pageId) {
+            val keywords = indexerDao.forwardIndex[pageId] as? List<Keyword> ?: return@getOrPut 1
+            keywords.sumOf { it.frequency }
         }
     }
 }
