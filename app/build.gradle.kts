@@ -1,10 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") // No version, inherited from root
+    id("com.github.johnrengelman.shadow") // No version, inherited from root
     application
 }
 
 group = "org.manganesium"
-version = "unspecified"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -33,7 +34,7 @@ tasks.register<JavaExec>("runTest") {
     group = "application"
     description = "Runs a specific main class for testing purposes."
     classpath = sourceSets["test"].runtimeClasspath
-    mainClass.set("app.TestMainKt") // Replace with your test main class
+    mainClass.set("app.TestMainKt")
     dependsOn("testClasses") // Ensure test classes are compiled
     workingDir = rootDir
 }
@@ -50,4 +51,32 @@ tasks.named<JavaExec>("run") {
 application {
     // Fully qualified name of the class containing the main function
     mainClass.set("app.AppMainKt")
+}
+
+tasks.jar {
+    archiveBaseName.set("Manganesium")
+    archiveVersion.set("1.0.0")
+    manifest {
+        attributes["Main-Class"] = "app.AppMainKt"
+    }
+    from(sourceSets["main"].output)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("Manganesium")
+    archiveVersion.set("1.0.0")
+    archiveClassifier.set("") // No classifier to replace the regular JAR
+    manifest {
+        attributes["Main-Class"] = "app.AppMainKt"
+    }
+    mergeServiceFiles() // Merge service descriptor files
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named("startScripts") {
+    dependsOn(tasks.shadowJar)
+}
+tasks.named("startShadowScripts") {
+    dependsOn(tasks.jar)
 }

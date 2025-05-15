@@ -5,4 +5,14 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.13/samples
  * This project uses @Incubating APIs which are subject to change.
  */
+plugins {
+    kotlin("jvm") version "2.1.10"  // Declare Kotlin plugin in root, apply false to avoid applying it to root
+    id("com.github.johnrengelman.shadow") version "8.1.1" // Declare Shadow plugin, apply false
+}
 
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}

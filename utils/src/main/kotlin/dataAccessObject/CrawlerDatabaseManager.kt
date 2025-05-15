@@ -35,7 +35,9 @@ open class CrawlerDatabaseManager(val db: DB) {
         .createOrOpen()
 
     fun close() {
-        db.commit()
-        db.close()
+        if (!db.isClosed()) {
+            db.commit()
+            db.close()
+        }
     }
 }

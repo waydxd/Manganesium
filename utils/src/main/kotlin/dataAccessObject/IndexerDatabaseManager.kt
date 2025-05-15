@@ -58,7 +58,9 @@ open class IndexerDatabaseManager(val db: DB) {
      * Commits changes and closes the database.
      */
     fun close() {
-        db.commit()
-        db.close()
+        if (!db.isClosed()) {
+            db.commit()
+            db.close()
+        }
     }
 }
