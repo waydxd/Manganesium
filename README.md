@@ -1,7 +1,7 @@
 # COMP4321 Group 25 - Manganesium 
-<div style="text-align: center;">
+<p align="center">
   <img src="web/src/assets/logo.png" alt="logo" width="300" />
-</div>
+</p>
 
 ## Project Description
 This project is a comprehensive application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
