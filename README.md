@@ -1,24 +1,26 @@
-# COMP4321 Group 25 - Manganesium 
+
+<div align="center" style="display: flex; align-items: center; gap: 10px;">
+    
+<h2 style="margin: 0;"> <img src="web/src/assets/logo.png" alt="logo" width="300" /></h2>
+</div>
+<h3 align="center">
+ Powering Your Knowledge with Elemental Speed! 🚀
+</h3>
+
 
 <p align="center">
-  <div style="display: inline-block; padding: 20px; background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); border-radius: 10px;">
-    <img src="web/src/assets/logo.png" alt="logo" width="300" />
-  </div>
-</p>
-
-<p >
-  <a href="https://github.com/waydxd/COMP4321-Group25"><img src="https://img.shields.io/github/stars/waydxd/COMP4321-Group25?style=social" alt="GitHub Stars"></a>
   <a href="https://github.com/waydxd/COMP4321-Group25/blob/main/LICENSE"><img src="https://img.shields.io/github/license/waydxd/COMP4321-Group25?color=blue" alt="License"></a>
-
-  [![My Skills](https://skillicons.dev/icons?i=kotlin,ktor,vite,vuejs,gradle,&theme=dark)](https://skillicons.dev)
-
+ <img src="https://img.shields.io/badge/Status-In%20Progress-yellow" alt="Project Status">
+    <img src="https://img.shields.io/github/last-commit/waydxd/COMP4321-Group25?label=Last%20Commit" alt="Last Commit">
+  <img src="https://img.shields.io/github/repo-size/waydxd/COMP4321-Group25?label=Repo%20Size" alt="Repository Size">
+  <a href="https://github.com/waydxd/COMP4321-Group25"><img src="https://img.shields.io/github/stars/waydxd/COMP4321-Group25?style=social" alt="GitHub Stars"></a>
 </p>
 
 
 ## Project Description
-This project is a comprehensive application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
+This project is a comprehensive search engine application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
 Design documents and other project-related files can be found in the [docs](docs) directory.
-## Screenshots
+## Screenshots of UI
 ![frontpage.png](docs/Screenshots/Frontpage.png)
 ![search.png](docs/Screenshots/search.png)
 ## Table of Contents
