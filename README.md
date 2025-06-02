@@ -1,7 +1,19 @@
 # COMP4321 Group 25 - Manganesium 
+
 <p align="center">
-  <img src="web/src/assets/logo.png" alt="logo" width="300" />
+  <div style="display: inline-block; padding: 20px; background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); border-radius: 10px;">
+    <img src="web/src/assets/logo.png" alt="logo" width="300" />
+  </div>
 </p>
+
+<p >
+  <a href="https://github.com/waydxd/COMP4321-Group25"><img src="https://img.shields.io/github/stars/waydxd/COMP4321-Group25?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/waydxd/COMP4321-Group25/blob/main/LICENSE"><img src="https://img.shields.io/github/license/waydxd/COMP4321-Group25?color=blue" alt="License"></a>
+
+  [![My Skills](https://skillicons.dev/icons?i=kotlin,ktor,vite,vuejs,gradle,&theme=dark)](https://skillicons.dev)
+
+</p>
+
 
 ## Project Description
 This project is a comprehensive application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
