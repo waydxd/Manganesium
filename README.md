@@ -17,13 +17,13 @@
 </p>
 
 
-## Project Description
+## 📖 Project Description
 This project is a comprehensive search engine application developed as part of the COMP4321 course by Group 25. The application leverages multiple technologies and frameworks to deliver a robust and efficient solution.
 Design documents and other project-related files can be found in the [docs](docs) directory.
-## Screenshots of UI
+## 📷 Screenshots of UI
 ![frontpage.png](docs/Screenshots/Frontpage.png)
 ![search.png](docs/Screenshots/search.png)
-## Table of Contents
+## 📋 Table of Contents
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -31,33 +31,33 @@ Design documents and other project-related files can be found in the [docs](docs
 - [License](#license)
 ```
 Manganesium
-├── app
-│   ├── Purpose: Integrates and runs the full pipeline (crawler, indexer, and test program for Phase 1; search and web later)
-│   ├── Usage: Executes main workflow, generates spider_result.txt for Phase 1
-│   └── Dependencies: crawler, indexer, utils (later: search, web)
-├── crawler
+├── 📁 app
+│   ├── Purpose: Hosts the Ktor server and invokes functions in the search module for rank calculations and other operations (Final Phase); also runs the full pipeline (crawler, indexer, and test program for Phase 1)
+│   ├── Usage: Executes main workflow, generates `spider_result.txt` for Phase 1, and serves as the backend server for the Final Phase
+│   └── Dependencies: crawler, indexer, search, utils, web
+├── 📁 crawler
 │   ├── Purpose: Crawls web pages and stores metadata/links in the database
-│   ├── Usage: Fetches 30 pages (Phase 1) or 300 pages (Final), populates db.pages, urlToPageId, parentToChildLinks, childToParentLinks
-│   └─── Dependencies: utils, indexer
-├── indexer
+│   ├── Usage: Fetches 30 pages (Phase 1) or 300 pages (Final), populates `db.pages`, `urlToPageId`, `parentToChildLinks`, `childToParentLinks`
+│   └── Dependencies: utils, indexer
+├── 📁 indexer
 │   ├── Purpose: Indexes pages from the database for search functionality
-│   ├── Usage: Builds inverted, forward indexes (bodyInvertedIndex, titleInvertedIndex) and documentFrequency from db.pages
+│   ├── Usage: Builds inverted, forward indexes (`bodyInvertedIndex`, `titleInvertedIndex`) and `documentFrequency` from `db.pages`
 │   └── Dependencies: utils
-├── search
-│   ├── Purpose: Implements the search engine backend (not in Phase 1)
-│   ├── Usage: Queries inverted indexes for ranked results (Final Submission)
-│   └── Dependencies: utils (later: indexer for db access)
-├── utils
+├── 📁 search
+│   ├── Purpose: Implements the search engine backend for ranked results (Final Phase)
+│   ├── Usage: Queries inverted indexes for ranked results, handles rank calculations and other search-related operations
+│   └── Dependencies: utils (for db access)
+├── 📁 utils
 │   ├── Purpose: Provides shared utilities for all modules
 │   ├── Usage: Reusable code for database access, and other common tasks
 │   └── Dependencies: None (standalone)
-└─── web
-    ├── Purpose: Front-end interface for search engine (not in Phase 1)
-    ├── Usage: Displays search results via a web UI (Final Submission)
-    ├── Dependencies: search, utils
-    └── Files: (TBD for Final Submission)
+└── 📁 web
+    ├── Purpose: Front-end interface for search engine (Final Phase)
+    ├── Usage: Displays search results via a web UI
+    └── Dependencies: only communicate with app modules (standalone)
+    
 ```
-## Technologies Used
+## 🛠 Technologies Used
 The project is built using the following technologies:
 - **Vue.js & Vite** (frontend)
 - **Kotlin** (backend)
@@ -71,7 +71,7 @@ The project is built using the following technologies:
   - Mockito
   - Ktor
 
-## Installation
+## 🔧 Installation
 To install and run this project locally, follow these steps:
 
 1. **(Optional if you have the repo zip) Clone the repository**:
@@ -99,7 +99,7 @@ To install and run this project locally, follow these steps:
       gradle build
       ```
 
-## Usage
+## 🚀 Usage
 To run the *project test program* for **Phase 1**, follow these steps:
 ```bash
 ./gradlew runTest
