@@ -1,7 +1,7 @@
 
 <div align="center" style="display: flex; align-items: center; gap: 10px;">
     
-<h2 style="margin: 0;"> <img src="web/src/assets/gradient.png" alt="logo" width="300" /></h2>
+<h2 style="margin: 0;"> <img src="web/src/assets/gradient.png" alt="logo" width="700" /></h2>
 </div>
 <h3 align="center">
  Powering Your Knowledge with Elemental Speed! 🚀
