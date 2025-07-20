@@ -43,7 +43,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
 }
 tasks.named<JavaExec>("run") {
     workingDir = rootDir
