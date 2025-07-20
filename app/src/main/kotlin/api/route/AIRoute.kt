@@ -14,13 +14,22 @@ import org.manganesium.ai.service.AIService
 /**
  * Configure AI-related routes
  */
-fun Route.configureAIRoutes(aiService: AIService) {
+fun Route.configureAIRoutes() {
     val logger = KotlinLogging.logger {}
 
     route("/v2/ai") {
         
         // Main AI ask endpoint
         post("/ask") {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@post
+            }
+            
             try {
                 val request = call.receive<AIAskRequest>()
                 logger.info { "AI ask request: ${request.question.take(50)}..." }
@@ -72,6 +81,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
 
         // AI health endpoint
         get("/health") {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@get
+            }
+            
             try {
                 val isHealthy = aiService.isHealthy()
                 val serviceInfo = aiService.getServiceInfo()
@@ -106,6 +124,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
         
         // Create new conversation
         post {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@post
+            }
+            
             try {
                 val request = call.receive<CreateConversationRequest>()
                 logger.info { "Creating conversation: ${request.title}" }
@@ -131,6 +158,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
 
         // Get conversations list
         get {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@get
+            }
+            
             try {
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 50
                 val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
@@ -158,6 +194,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
 
         // Get specific conversation with messages
         get("/{id}") {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@get
+            }
+            
             try {
                 val conversationId = call.parameters["id"] ?: ""
                 val conversation = aiService.getConversation(conversationId)
@@ -198,6 +243,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
 
         // Add message to conversation
         post("/{id}/messages") {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@post
+            }
+            
             try {
                 val conversationId = call.parameters["id"] ?: ""
                 val request = call.receive<AddMessageRequest>()
@@ -259,6 +313,15 @@ fun Route.configureAIRoutes(aiService: AIService) {
 
         // Delete conversation
         delete("/{id}") {
+            val aiService = ServiceHolder.getAIService()
+            if (aiService == null) {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable,
+                    mapOf("error" to "AI service is not initialized")
+                )
+                return@delete
+            }
+            
             try {
                 val conversationId = call.parameters["id"] ?: ""
                 val success = aiService.deleteConversation(conversationId)

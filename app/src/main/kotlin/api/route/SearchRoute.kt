@@ -115,27 +115,8 @@ fun Application.configureRouting() {
                 )
             }
 
-            // Add AI routes if AI service is available
-            val aiService = ServiceHolder.getAIService()
-            if (aiService != null) {
-                configureAIRoutes(aiService)
-            } else {
-                // Provide fallback endpoints that indicate AI is not available
-                route("/v2/ai") {
-                    get("/health") {
-                        call.respond(
-                            HttpStatusCode.ServiceUnavailable,
-                            mapOf("error" to "AI service is not configured or unavailable")
-                        )
-                    }
-                    post("/ask") {
-                        call.respond(
-                            HttpStatusCode.ServiceUnavailable,
-                            mapOf("error" to "AI service is not configured. Please set OPENAI_API_KEY environment variable.")
-                        )
-                    }
-                }
-            }
+            // Add AI routes (always register, let them handle configuration internally)
+            configureAIRoutes()
         }
     }
 }
