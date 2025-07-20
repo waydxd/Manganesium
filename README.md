@@ -61,7 +61,7 @@ Manganesium
 The project is built using the following technologies:
 - Frontend:
 
-[![Frontend](https://skillicons.dev/icons?i=js,html,css,vuejs,vite)](https://skillicons.dev)
+[![Frontend](https://skillicons.dev/icons?i=ts,vuejs,vite)](https://skillicons.dev)
 - Backend:
 
 [![Backend](https://skillicons.dev/icons?i=kotlin,ktor,gradle,mockito)](https://skillicons.dev)
