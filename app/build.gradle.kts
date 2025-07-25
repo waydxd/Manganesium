@@ -18,6 +18,11 @@ dependencies {
     implementation(project(":indexer"))  // Add dependency to indexer module
     implementation(project(":crawler"))  // Add dependency to crawler module
     implementation(project(":search"))
+    implementation(project(":ai"))  // Add dependency to AI module
+    
+    // MapDB dependency (for AI service)
+    implementation("org.mapdb:mapdb:3.0.8")
+    
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.5.13")
@@ -43,7 +48,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
 }
 tasks.named<JavaExec>("run") {
     workingDir = rootDir
